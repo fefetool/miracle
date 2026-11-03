@@ -3,13 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v9</title>
+<title>Miracle v10</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
+<meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Dancing+Script:wght@500;700&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Amatic+SC:wght@400;700&family=Indie+Flower&family=Kalam:wght@400;700&family=Pacifico&family=Satisfy&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ffffff;--ink:#222222}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Caveat','Patrick Hand',cursive;color:var(--ink)}
-html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body{position:fixed;inset:0;width:100%}
-#phone{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);transition:background .3s}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;height:var(--vh,100dvh)}
+#phone{position:relative;width:100%;height:100vh;height:100dvh;height:var(--vh,100dvh);overflow:hidden;background:var(--bg);transition:background .3s}
 @media (min-width:600px){
   html,body{background:#d9d9de;display:flex;align-items:center;justify-content:center}
   #phone{height:min(844px,96vh);width:auto;aspect-ratio:390/844;border:10px solid #111;border-radius:52px;box-shadow:0 20px 60px #0003}
@@ -97,7 +100,8 @@ function applyTheme(){
 $('theme').onclick = () => { ti = (ti + 1) % THEMES.length; applyTheme(); };
 $('theme2').onclick = () => { tpl = (tpl + 1) % TPLS.length; if(window._redraw){const ls=['stack','poster','quote','ribbon','note'],d=window._design||(window._design={});d.layout=ls[(ls.indexOf(d.layout)+1)%5];d.align=['left','center','right'][tpl%3]} compose(window._img||null, lastPoem); };
 
-function fit(){const d=devicePixelRatio||1;pad.width=BW()*d;pad.height=BH()*d;redraw()}
+function setVh(){document.documentElement.style.setProperty('--vh',(window.visualViewport?visualViewport.height:innerHeight)+'px')}
+function fit(){setVh();const d=devicePixelRatio||1;pad.width=BW()*d;pad.height=BH()*d;redraw()}
 function redraw(){
   const d=devicePixelRatio||1;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,pad.width,pad.height);
   ctx.lineCap=ctx.lineJoin='round';ctx.strokeStyle=THEMES[ti].ink;ctx.lineWidth=3;
@@ -473,6 +477,7 @@ $('joy').onclick=()=>share('I made a little miracle today. Sending you some hope
 $('again').onclick=()=>{strokes=[];window._img=null;$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
 
 applyTheme();fit();
+['resize','orientationchange'].forEach(e=>addEventListener(e,()=>setTimeout(fit,60)));if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(fit,60));
 </script>
 </body>
 </html>
