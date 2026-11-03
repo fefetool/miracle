@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v13</title>
+<title>Miracle v14</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
 <meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
@@ -47,6 +47,28 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #imgv img{max-width:100%;max-height:100%;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;touch-action:manipulation}
 #imgv .x{position:absolute;top:calc(14px + env(safe-area-inset-top));left:14px;width:44px;height:44px;background:#0006;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}
 #imgv .x svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
+
+#tour{position:absolute;inset:0;z-index:40;overflow:hidden}
+#tour *{font-family:var(--tf),cursive;color:#3a3a4a}
+#tour .hole{position:absolute;border-radius:26px;box-shadow:0 0 0 2400px rgba(12,12,40,.64);border:3px dashed #fffc;transition:left .35s,top .35s,width .35s,height .35s}
+#tour .bub{position:absolute;background:#fffdf5;border:3px solid #3a3a4a;border-radius:28px 32px 26px 34px;padding:16px 18px 14px 16px;box-shadow:0 10px 30px #0005;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+#tour .bub .in{animation:bob 1.8s ease-in-out infinite;display:block}
+#tour .top{display:flex;align-items:center;gap:12px}
+#tour .mas{width:54px;height:54px;flex:none;animation:wave 1.4s ease-in-out infinite}
+#tour .mas svg{width:100%;height:100%}
+#tour .tt{font-size:26px;font-weight:700;line-height:1.25;padding-right:18px}
+#tour .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+#tour .dots{display:flex;gap:7px}
+#tour .dots i{width:10px;height:10px;border-radius:50%;background:#3a3a4a33}
+#tour .dots i.on{background:#e8657f}
+#tour .nx{background:none;border:0;display:flex;align-items:center;gap:6px;font-size:25px;font-weight:700;padding:2px 4px}
+#tour .nx svg{width:30px;height:30px;stroke:#e8657f;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+#tour .cl{position:absolute;top:-14px;right:-12px;width:34px;height:34px;border-radius:50%;background:#fffdf5;border:3px solid #3a3a4a;padding:0;display:flex;align-items:center;justify-content:center}
+#tour .cl svg{width:16px;height:16px;stroke:#3a3a4a;fill:none;stroke-width:3.4;stroke-linecap:round}
+#tour .tail{position:absolute;width:22px;height:22px;background:#fffdf5;border:3px solid #3a3a4a;transform:rotate(45deg)}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes wave{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-3px)}}
 </style>
 </head>
 <body>
@@ -180,7 +202,7 @@ $('miracle').onclick=async()=>{
     }else await new Promise(r=>setTimeout(r,1200));
     window._img=img;tpl=Math.floor(Math.random()*TPLS.length);
     compose(img,poem);
-    pad.style.display='none';$('draw').hidden=true;$('result').hidden=false;
+    pad.style.display='none';$('draw').hidden=true;$('result').hidden=false;setTimeout(()=>runTour('result'),900);
   }catch(err){alert(ERR[lang])}
   $('busy').hidden=true;
 };
@@ -524,8 +546,46 @@ $('share').onclick=()=>openSheet(lastPoem.replace(/\n/g,' · '));
 $('joy').onclick=()=>openSheet(JOY[lang]);
 $('again').onclick=()=>{strokes=[];window._img=null;$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
 
+
+// ===== Friendly step-by-step tour (X = never show again) =====
+const TOUR={
+ en:{pad:'Draw anything you feel, right here on the blank space',lang:'Pick your language here',go:'Done drawing? Press here and a little miracle appears',bar:'Save it, share it, or send joy to a friend',dot:'Tap this dot to change the text design',next:'Next',ok:'Got it'},
+ zh:{pad:'在空白的地方，隨心畫下此刻的心情',lang:'在這裡選擇語言',go:'畫好了嗎？按這裡，奇蹟就會出現',bar:'可以存圖、分享，或把好心情送給朋友',dot:'點這個圓點，換一種文字設計',next:'下一步',ok:'知道了'},
+ ja:{pad:'空いているところに、今の気持ちを自由に描いてね',lang:'ここで言語を選べます',go:'描けたら、ここを押すと小さな奇跡が現れます',bar:'保存したり、シェアしたり、友だちに喜びを送れます',dot:'この丸をタップすると文字のデザインが変わります',next:'次へ',ok:'わかった'}};
+const TSTEPS={draw:[['pad','pad'],['#draw .lang','lang'],['#miracle','go']],result:[['#result .bottom','bar'],['#theme2','dot']]};
+const tget=k=>{try{return localStorage.getItem('mr_tour_'+k)==='1'}catch(e){return false}},tset=k=>{try{localStorage.setItem('mr_tour_'+k,'1')}catch(e){}};
+let tourOn=false;
+function runTour(kind){
+  if(tget('off')||tget(kind)||tourOn)return;
+  const steps=TSTEPS[kind];let i=0;tourOn=true;
+  const root=document.createElement('div');root.id='tour';
+  root.style.setProperty('--tf',lang==='zh'?"'LXGW WenKai TC'":lang==='ja'?"'Klee One'":"'Caveat'");
+  root.innerHTML='<div class="hole"></div><div class="bub"><i class="tail"></i><span class="in"><div class="top"><div class="mas"><svg viewBox="0 0 60 60"><path d="M30 6C45 6 54 17 54 31C54 46 44 55 30 55C16 55 6 46 6 31C6 17 15 6 30 6Z" fill="#ffe08a" stroke="#3a3a4a" stroke-width="3"/><circle cx="22" cy="29" r="3" fill="#3a3a4a"/><circle cx="38" cy="29" r="3" fill="#3a3a4a"/><path d="M23 38Q30 45 37 38" fill="none" stroke="#3a3a4a" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="36" r="4" fill="#ffb4a2" opacity=".7"/><circle cx="44" cy="36" r="4" fill="#ffb4a2" opacity=".7"/></svg></div><div class="tt"></div></div><div class="row"><span class="dots"></span><button class="nx"><span></span><svg viewBox="0 0 30 30"><path d="M5 15C11 14 17 16 24 15"/><path d="M18 8L25 15L18 22"/></svg></button></div></span><button class="cl" aria-label="close"><svg viewBox="0 0 16 16"><path d="M3 3L13 13M13 3L3 13"/></svg></button></div>';
+  $('phone').appendChild(root);
+  const hole=root.querySelector('.hole'),bub=root.querySelector('.bub'),tail=root.querySelector('.tail'),tt=root.querySelector('.tt'),dots=root.querySelector('.dots'),nx=root.querySelector('.nx');
+  const end=done=>{root.remove();tourOn=false;if(done)tset(kind)};
+  function place(){
+    const [sel,key]=steps[i],P=$('phone').getBoundingClientRect();let r;
+    if(sel==='pad'){r={left:P.width*.12,top:P.height*.16,width:P.width*.76,height:P.height*.3}}
+    else{const b=document.querySelector(sel).getBoundingClientRect();r={left:b.left-P.left-8,top:b.top-P.top-8,width:b.width+16,height:b.height+16}}
+    Object.assign(hole.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
+    tt.textContent=TOUR[lang][key];nx.firstChild.textContent=i<steps.length-1?TOUR[lang].next:TOUR[lang].ok;
+    dots.innerHTML=steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+    bub.style.animation='none';bub.offsetWidth;bub.style.animation='';
+    bub.style.width=Math.min(P.width*.86,360)+'px';
+    const bw=bub.offsetWidth,bh=bub.offsetHeight,cx=r.left+r.width/2,below=r.top+r.height/2<P.height*.55;
+    const left=Math.max(12,Math.min(P.width-bw-12,cx-bw/2));
+    bub.style.left=left+'px';bub.style.top=(below?r.top+r.height+26:r.top-bh-26)+'px';
+    tail.style.left=Math.max(26,Math.min(bw-48,cx-left-11))+'px';
+    tail.style.top=below?'-13px':'auto';tail.style.bottom=below?'auto':'-13px';
+    tail.style.borderWidth=below?'3px 0 0 3px':'0 3px 3px 0';
+  }
+  nx.onclick=()=>{if(i<steps.length-1){i++;place()}else end(true)};
+  root.querySelector('.cl').onclick=()=>{tset('off');end(false)};
+  place();
+}
 document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[lang]);$('busy').textContent=BUSY[lang];
-applyTheme();fit();
+applyTheme();fit();setTimeout(()=>runTour('draw'),900);
 ['resize','orientationchange'].forEach(e=>addEventListener(e,()=>setTimeout(fit,60)));if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(fit,60));
 </script>
 </body>
