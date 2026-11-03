@@ -451,7 +451,7 @@ function fullCard(c,img,L){
   else if(lay==='poster'){const y=H*.725;try{c.letterSpacing='9px'}catch(e){}row(L[0].toUpperCase(),x,y,92,hw,ink,al);try{c.letterSpacing='0px'}catch(e){}
     const x1=al==='left'?90:al==='right'?W-390:W*.32,x2=al==='left'?390:al==='right'?W-90:W*.68;c.save();c.shadowBlur=0;line(c,x1,y+34,x2,y+34,ink,4,.9);c.restore();
     [1,2,3].forEach(i=>row(L[i],x,y+112+(i-1)*84,62,bw,ink,al))}
-  else if(lay==='quote'){const y=H*.745;c.save();c.shadowBlur=0;sparkle(c,W/2,y-92,30,ink,5);c.restore();
+  else if(lay==='quote'){const y=H*.745;c.save();c.shadowBlur=0;sparkle(c,W/2,y-(lang==='en'?92:150),30,ink,5);c.restore();
     row(L[0],W/2,y,108,hw,ink,'center');[1,2,3].forEach(i=>row(L[i],W/2,y+92+(i-1)*88,70,bw,ink,'center'));
     c.save();c.shadowBlur=0;sparkle(c,W/2,y+92+3*88-20,22,ink,4);c.restore()}
   else if(lay==='ribbon'){const by=H*.69;c.save();c.shadowColor='#0004';c.shadowBlur=18;c.shadowOffsetY=8;rectW(c,60,by,W-120,190,paperInk,5,'#fffdf5ee');c.restore();
