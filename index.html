@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Miracle v5</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--ink:#222222}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Caveat','Patrick Hand',cursive;color:var(--ink)}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);touch-action:none}
+#phone{position:relative;width:100%;height:100%;overflow:hidden;background:var(--bg);transition:background .3s}
+@media (min-width:600px){
+  html,body{background:#d9d9de;display:flex;align-items:center;justify-content:center}
+  #phone{height:min(844px,96vh);width:auto;aspect-ratio:390/844;border:10px solid #111;border-radius:52px;box-shadow:0 20px 60px #0003}
+  #phone::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:100px;height:28px;border-radius:16px;background:#111;z-index:9}
+  #draw .logo{top:52px!important}
+  .dot{top:60px!important}
+}
+#pad{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.screen{position:absolute;inset:0;pointer-events:none}
+.screen[hidden]{display:none}
+.screen>*{pointer-events:auto}
+.logo{position:absolute;top:calc(14px + env(safe-area-inset-top));left:20px;font-size:34px;font-weight:700}
+.dot{position:absolute;top:calc(22px + env(safe-area-inset-top));right:20px;width:20px;height:20px;border-radius:50%;background:var(--ink);border:0;padding:0;z-index:3}
+.bottom{position:absolute;left:0;right:0;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;padding:0 14px}
+.ico{background:none;border:0;padding:8px;cursor:pointer;line-height:0}
+.ico svg{width:46px;height:46px;stroke:var(--ink);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.ico:active{opacity:.4;transform:scale(.9)}
+.oval{width:92px;height:150px;border:3px solid var(--ink);border-radius:48% 52% 50% 50% / 38% 40% 60% 62%;background:none;font-size:28px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.oval:active{transform:scale(.95)}
+/* result card = full screen */
+#out{position:absolute;inset:0;width:100%;height:100%;display:block}
+#busy{position:absolute;inset:0;background:var(--bg);opacity:.92;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;z-index:5}
+#busy[hidden]{display:none}
+</style>
+</head>
+<body>
+<div id="phone">
+<canvas id="pad"></canvas>
+
+<section id="draw" class="screen">
+  <div class="logo">miracle.</div>
+  <button class="dot" id="theme" aria-label="theme"></button>
+  <div class="bottom">
+    <button class="ico" id="undo" aria-label="undo"><svg viewBox="0 0 48 48"><path d="M36 34C42 22 31 11 18 15C15 16 13 18 11 21"/><path d="M10 11L11 22L22 20"/></svg></button>
+    <button class="oval" id="miracle">miracle</button>
+    <button class="ico" id="clear" aria-label="clear"><svg viewBox="0 0 48 48"><path d="M11 29L25 12L39 24L27 38L19 38Z"/><path d="M18 22L31 33"/><path d="M9 43C20 41 31 44 41 42"/></svg></button>
+  </div>
+</section>
+
+<section id="result" class="screen" hidden>
+  <canvas id="out"></canvas>
+  <button class="dot" id="theme2" aria-label="template"></button>
+  <div class="bottom">
+    <button class="ico" id="save" aria-label="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg></button>
+    <button class="ico" id="share" aria-label="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg></button>
+    <button class="ico" id="joy" aria-label="send joy"><svg viewBox="0 0 48 48"><path d="M24 41C8 29 5 17 13 11C18 8 23 11 24 16C25 11 30 8 35 11C43 17 40 29 24 41Z"/></svg></button>
+    <button class="ico" id="again" aria-label="new"><svg viewBox="0 0 48 48"><path d="M24 7C25 18 23 30 24 41"/><path d="M8 24C18 25 30 23 41 24"/><path d="M36 9L40 13"/></svg></button>
+  </div>
+</section>
+
+<div id="busy" hidden>dreaming...</div>
+</div>
+<script>
+// ===== Config: Edge Function on the UTRA Supabase project =====
+const SUPABASE_URL = 'https://iuwomesavaagifvhokkt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1d29tZXNhdmFhZ2lmdmhva2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMjc4MzAsImV4cCI6MjA5OTYwMzgzMH0.4JeKzdoOdLCl0AKD5WoHprxu_3Gt_6rGUzLLxFw-UO8';
+const FUNCTION_NAME = 'miracle';
+
+const POEMS = [
+  "Hope starts small.\nEven the smallest line\nholds a whole sky.\nYou just drew yours.",
+  "You made light.\nOne gentle stroke,\none quiet spark,\nand the world answered back.",
+  "Your heart blooms.\nEvery heart has a garden.\nToday, you watered yours\nwithout even knowing.",
+  "Soft days shine.\nGrey mornings pass,\nstars stay patient,\nand so do you.",
+  "Begin again.\nNo rush, no rules,\njust a pencil and a feeling.\nThat is already a miracle.",
+  "Be your story.\nWhatever you feel today,\nit is welcome here,\nand it is beautiful."
+];
+const THEMES = [
+  {bg:'#ffffff',ink:'#222222'},
+  {bg:'#154c3c',ink:'#e8f5ec'},
+  {bg:'#7ec8ff',ink:'#12304a'},
+  {bg:'#c8f5e0',ink:'#a02c2c'}
+];
+const INKS = ['#3b4a6b','#b5384f','#f4f1e4','#5a3d1e','#1d4e89'];
+const $ = id => document.getElementById(id);
+const pad = $('pad'), ctx = pad.getContext('2d'), box = $('phone');
+const BW=()=>box.clientWidth, BH=()=>box.clientHeight;
+let ti = 0, tpl = 0, strokes = [], cur = null, lastPoem = '';
+
+function applyTheme(){
+  const t = THEMES[ti];
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--ink', t.ink);
+  redraw();
+}
+$('theme').onclick = () => { ti = (ti + 1) % THEMES.length; applyTheme(); };
+$('theme2').onclick = () => { tpl = (tpl + 1) % TPLS.length; compose(window._img||null, lastPoem); };
+
+function fit(){const d=devicePixelRatio||1;pad.width=BW()*d;pad.height=BH()*d;redraw()}
+function redraw(){
+  const d=devicePixelRatio||1;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,pad.width,pad.height);
+  ctx.lineCap=ctx.lineJoin='round';ctx.strokeStyle=THEMES[ti].ink;ctx.lineWidth=3;
+  strokes.forEach(s=>{ctx.beginPath();s.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));
+    if(s.length==1)ctx.lineTo(s[0].x+.1,s[0].y);ctx.stroke()});
+}
+addEventListener('resize',fit);
+const pt=e=>{const r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+pad.onpointerdown=e=>{pad.setPointerCapture(e.pointerId);cur=[pt(e)];strokes.push(cur);redraw()};
+pad.onpointermove=e=>{if(!cur)return;cur.push(pt(e));redraw()};
+pad.onpointerup=pad.onpointercancel=()=>{cur=null};
+$('undo').onclick=()=>{strokes.pop();redraw()};
+$('clear').onclick=()=>{strokes=[];redraw()};
+
+// crop the doodle (with margin), send dark lines on white; remember the crop so the original lines can be laid back on top
+function snapshot(){
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  strokes.forEach(s=>s.forEach(q=>{x0=Math.min(x0,q.x);y0=Math.min(y0,q.y);x1=Math.max(x1,q.x);y1=Math.max(y1,q.y)}));
+  const m=Math.max(x1-x0,y1-y0)*.12+24;x0-=m;y0-=m;x1+=m;y1+=m;
+  const bw=x1-x0,bh=y1-y0,s=Math.min(1,768/Math.max(bw,bh)),t=document.createElement('canvas');
+  t.width=Math.round(bw*s);t.height=Math.round(bh*s);const x=t.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,t.width,t.height);
+  x.strokeStyle='#222';x.lineWidth=4;x.lineCap=x.lineJoin='round';
+  strokes.forEach(st=>{x.beginPath();st.forEach((q,i)=>i?x.lineTo((q.x-x0)*s,(q.y-y0)*s):x.moveTo((q.x-x0)*s,(q.y-y0)*s));
+    if(st.length==1)x.lineTo((st[0].x-x0)*s+.1,(st[0].y-y0)*s);x.stroke()});
+  window._crop={x0,y0,w:bw,h:bh,pw:t.width,ph:t.height};
+  return t.toDataURL('image/png');
+}
+
+// ===== Miracle =====
+$('miracle').onclick=async()=>{
+  if(!strokes.length)return;
+  $('busy').hidden=false;
+  try{
+    let img=null,poem=POEMS[Math.floor(Math.random()*POEMS.length)];
+    if(SUPABASE_URL){
+      const res=await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`,{method:'POST',
+        headers:{'Content-Type':'application/json',Authorization:'Bearer '+SUPABASE_ANON_KEY},
+        body:JSON.stringify((()=>{const image=snapshot();return{image,width:window._crop.pw,height:window._crop.ph}})())});
+      const j=await res.json();
+      if(!j.svg)throw new Error(j.error||'fail');
+      poem=j.poem||poem;
+      img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(j.svg)});
+    }else await new Promise(r=>setTimeout(r,1200));
+    window._img=img;
+    compose(img,poem);
+    pad.style.display='none';$('draw').hidden=true;$('result').hidden=false;
+  }catch(err){alert('please try again')}
+  $('busy').hidden=true;
+};
+
+// ===== Hand-drawn engine =====
+let W=1080,H=2340,_s=1;
+const F='Caveat, cursive';
+const R=()=>{_s=(_s*16807)%2147483647;return _s/2147483647};
+const rs=(a,b)=>a+(b-a)*R();
+function trace(c,q,close){
+  c.beginPath();const n=q.length;
+  if(close){c.moveTo((q[n-1][0]+q[0][0])/2,(q[n-1][1]+q[0][1])/2);
+    for(let i=0;i<n;i++){const a=q[i],b=q[(i+1)%n];c.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}c.closePath()}
+  else{c.moveTo(q[0][0],q[0][1]);
+    for(let i=1;i<n-1;i++){const a=q[i],b=q[i+1];c.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}
+    c.lineTo(q[n-1][0],q[n-1][1])}
+}
+// wobbly pencil line through points
+function wl(c,p,col,w,al,close,fill){
+  const j=w*.45,q=p.map(a=>[a[0]+rs(-j,j),a[1]+rs(-j,j)]);
+  c.save();c.lineCap=c.lineJoin='round';trace(c,q,close);
+  if(fill){c.globalAlpha=1;c.fillStyle=fill;c.fill()}
+  c.globalAlpha=al==null?1:al;c.strokeStyle=col;c.lineWidth=w;c.stroke();c.restore();
+}
+function line(c,x1,y1,x2,y2,col,w,al){
+  const d=Math.hypot(x2-x1,y2-y1),n=Math.max(3,Math.round(d/70)),p=[];
+  for(let i=0;i<=n;i++)p.push([x1+(x2-x1)*i/n,y1+(y2-y1)*i/n]);
+  wl(c,p,col,w,al);wl(c,p,col,w*.55,(al==null?1:al)*.55);
+}
+function oval(c,cx,cy,rx,ry,col,w,fill,al){
+  for(let k=0;k<2;k++){const a0=R()*6.28,p=[];
+    for(let i=0;i<16;i++){const a=a0+i/16*6.28,r=1+rs(-.03,.03);p.push([cx+Math.cos(a)*rx*r,cy+Math.sin(a)*ry*r])}
+    wl(c,p,col,k?w*.55:w,al,true,k?null:fill)}
+}
+function rectW(c,x,y,w,h,col,wd,fill,al){
+  const p=[],n=Math.max(2,Math.round(w/110)),m=Math.max(2,Math.round(h/110));
+  for(let i=0;i<n;i++)p.push([x+w*i/n,y]);for(let i=0;i<m;i++)p.push([x+w,y+h*i/m]);
+  for(let i=0;i<n;i++)p.push([x+w-w*i/n,y+h]);for(let i=0;i<m;i++)p.push([x,y+h-h*i/m]);
+  wl(c,p,col,wd,al,true,fill);
+}
+function blob(c,cx,cy,rx,ry,col,al){
+  for(let k=0;k<3;k++){const p=[],n=18,sc=1-k*.18;
+    for(let i=0;i<n;i++){const a=i/n*6.28;p.push([cx+Math.cos(a)*rx*sc*rs(.8,1.1),cy+Math.sin(a)*ry*sc*rs(.8,1.1)])}
+    c.save();c.globalAlpha=al*(k?.5:1);c.fillStyle=col;trace(c,p,true);c.fill();
+    if(!k){c.globalAlpha=al*.7;c.strokeStyle=col;c.lineWidth=5;c.stroke()}c.restore()}
+}
+function paper(c,base,speck,dens){
+  c.fillStyle=base;c.fillRect(0,0,W,H);
+  c.fillStyle=speck;
+  for(let i=0;i<(dens||2600);i++){c.globalAlpha=rs(.03,.1);c.fillRect(R()*W,R()*H,rs(1,3),rs(1,3))}
+  c.globalAlpha=1;
+}
+function star(c,x,y,r,col,w,fill){const p=[];for(let i=0;i<10;i++){const a=-1.57+i*.628,rr=i%2?r*.45:r;p.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr])}wl(c,p,col,w,1,true,fill)}
+function heart(c,x,y,s,col,w,fill){const p=[];for(let t=0;t<6.28;t+=.3){
+  p.push([x+s*Math.pow(Math.sin(t),3),y-s/16*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))])}wl(c,p,col,w,1,true,fill)}
+function sparkle(c,x,y,r,col,w){line(c,x-r,y,x+r,y,col,w);line(c,x,y-r,x,y+r,col,w);line(c,x-r*.5,y-r*.5,x+r*.5,y+r*.5,col,w*.7,.7);line(c,x+r*.5,y-r*.5,x-r*.5,y+r*.5,col,w*.7,.7)}
+function leaf(c,x,y,len,ang,col,fill){
+  const up=[],dn=[],n=7;
+  for(let i=0;i<=n;i++){const t=i/n,wd=Math.sin(Math.PI*t)*len*.24;up.push([t*len,-wd]);dn.push([t*len,wd])}
+  const pts=up.concat(dn.reverse().slice(1,-1)),ca=Math.cos(ang),sa=Math.sin(ang);
+  const q=pts.map(p=>[x+p[0]*ca-p[1]*sa,y+p[0]*sa+p[1]*ca]);
+  wl(c,q,col,4,1,true,fill);line(c,x,y,x+len*.9*ca,y+len*.9*sa,col,2.5,.7);
+}
+function flower(c,x,y,r,col,fill,stem){
+  if(stem){line(c,x,y+r*.6,x+rs(-10,10),y+r*.6+stem,col,4);leaf(c,x,y+r*.6+stem*.55,r*1.1,.5,col,fill);leaf(c,x,y+r*.6+stem*.35,r*1.1,2.6,col,fill)}
+  for(let k=0;k<5;k++){const a=-1.57+k*1.2566;oval(c,x+Math.cos(a)*r*.62,y+Math.sin(a)*r*.62,r*.5,r*.5,col,4,fill)}
+  oval(c,x,y,r*.25,r*.25,col,3.5,'#ffd166aa');
+}
+function sprout(c,x,y,h,col,fill){line(c,x,y,x,y-h,col,4);leaf(c,x,y-h*.9,h*.55,-.5,col,fill);leaf(c,x,y-h*.7,h*.55,-2.64,col,fill)}
+function cloud(c,x,y,w,col,fill,wd,hr){
+  const p=[],rx=w/2,ry=w*(hr||.3);
+  for(let i=0;i<30;i++){const a=i/30*6.28,r=1+.16*Math.abs(Math.sin(a*1.5+.4));p.push([x+Math.cos(a)*rx*r,y+Math.sin(a)*ry*r])}
+  wl(c,p,col,wd||4,1,true,fill);
+}
+function tape(c,x,y,w,h,ang,col){
+  c.save();c.translate(x,y);c.rotate(ang);c.globalAlpha=.8;c.fillStyle=col;c.beginPath();
+  c.moveTo(-w/2,-h/2);c.lineTo(w/2,-h/2);for(let i=0;i<4;i++)c.lineTo(w/2+(i%2?-8:8),-h/2+h*(i+1)/4);
+  c.lineTo(-w/2,h/2);for(let i=3;i>=0;i--)c.lineTo(-w/2+(i%2?8:-8),-h/2+h*i/4);c.closePath();c.fill();c.restore();
+}
+function size(c,txt,sz,wt,maxW){while(sz>36){c.font=`${wt} ${sz}px ${F}`;if(c.measureText(txt).width<=maxW)break;sz-=4}return sz}
+// text; hcol = marker highlight color (drawn under the text)
+function tx(c,txt,x,y,sz,wt,col,al,maxW,hcol){
+  c.fillStyle=col;c.textAlign=al||'left';sz=size(c,txt,sz,wt,maxW||W-160);c.font=`${wt} ${sz}px ${F}`;
+  if(hcol&&txt){const w=c.measureText(txt).width,x0=al==='center'?x-w/2:al==='right'?x-w:x;
+    wl(c,[[x0-10,y-sz*.18],[x0+w*.5,y-sz*.14],[x0+w+10,y-sz*.2]],hcol,sz*.34,.55);c.fillStyle=col}
+  c.fillText(txt,x,y);return sz;
+}
+// the picture: AI illustration, or (demo) a crayon redraw of the doodle
+function art(c,img,x,y,w,h){
+  if(img){
+    const k=window._crop;
+    if(!k){const s=Math.min(w/img.width,h/img.height),iw=img.width*s,ih=img.height*s;c.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);return}
+    // AI colouring layer first, then the person's own original lines on top: it is still their drawing
+    const s=Math.min(w/k.w,h/k.h),ox=x+(w-k.w*s)/2,oy=y+(h-k.h*s)/2;
+    c.drawImage(img,ox,oy,k.w*s,k.h*s);
+    strokes.forEach(st=>{const p=st.map(q=>[(q.x-k.x0)*s+ox,(q.y-k.y0)*s+oy]);if(p.length<2)p.push([p[0][0]+1,p[0][1]]);
+      wl(c,p,'#2f2f2f',Math.max(5,3.4*s),.92)});
+    return}
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  strokes.forEach(s=>s.forEach(q=>{x0=Math.min(x0,q.x);y0=Math.min(y0,q.y);x1=Math.max(x1,q.x);y1=Math.max(y1,q.y)}));
+  const bw=Math.max(x1-x0,1),bh=Math.max(y1-y0,1),s=Math.min(w*.8/bw,h*.8/bh),ox=x+(w-bw*s)/2-x0*s,oy=y+(h-bh*s)/2-y0*s;
+  const cols=['#e8657f','#f4a259','#4f8fd6','#8e63c9','#4aa87a'];
+  strokes.forEach((st,i)=>{
+    const pts=st.map(q=>[q.x*s+ox,q.y*s+oy]);if(pts.length<2)pts.push([pts[0][0]+1,pts[0][1]]);
+    const col=cols[i%cols.length];
+    wl(c,pts,col,34,.28);wl(c,pts,col,22,.55);wl(c,pts,col,12,.9);wl(c,pts,'#ffffff',4,.5);wl(c,pts,'#3a3a3a',2.5,.8);
+  });
+}
+const sig=(c,col)=>tx(c,'miracle.',64,H*.052,50,700,col,'left');
+
+// ===== Templates: full-screen hand-drawn paper cards =====
+// g = {x0,y0,s,ty}: art square and headline baseline
+const TPLS=[
+// 1 Watercolor Garden
+(c,img,L,g)=>{
+  paper(c,'#fbf6ec','#8a6a3a');
+  blob(c,W*.12,H*.1,460,380,'#9cc9e8',.5);blob(c,W*.92,H*.28,420,380,'#f2b8cf',.5);
+  blob(c,W*.1,H*.62,380,420,'#b9e3d0',.5);blob(c,W*.88,H*.86,460,380,'#cdbdf0',.5);
+  flower(c,W*.86,H*.065,58,'#c4587f','#f2b8cf66',90);flower(c,W*.1,H*.915,64,'#5b86b8','#9cc9e866',60);
+  flower(c,W*.92,H*.62,52,'#c4587f','#f2b8cf66',70);flower(c,W*.07,H*.4,48,'#5b86b8','#9cc9e866',70);
+  leaf(c,W*.04,H*.14,150,.9,'#6b8f5e','#b9e3d055');leaf(c,W*.95,H*.8,140,-2.4,'#6b8f5e','#b9e3d055');
+  sparkle(c,W*.8,H*.2,26,'#c9a44c',4);sparkle(c,W*.16,H*.3,22,'#c9a44c',4);
+  const cx=W/2,cy=g.y0+g.s/2;
+  oval(c,cx,cy,g.s*.53,g.s*.53,'#8a7a9b',5,'#ffffff88');
+  art(c,img,g.x0,g.y0,g.s,g.s);
+  sig(c,INKS[0]);
+  tx(c,L[0],cx,g.ty,150,700,'#2b2d42','center',W-160,'#f2b8cf');
+  [1,2,3].forEach(i=>tx(c,L[i],cx,g.ty+105+(i-1)*84,60,500,'#3d405b','center',W-160));
+},
+// 2 Doodle Pink
+(c,img,L,g)=>{
+  paper(c,'#fde4e8','#b06070');
+  [[.1,.075,40],[.9,.06,34],[.93,.42,44],[.07,.5,36],[.93,.87,38],[.12,.86,34],[.5,.03,26]].forEach(([x,y,r],i)=>heart(c,W*x,H*y,r,'#d4566a',5,i%2?'#f48fa355':'#ffffff88'));
+  flower(c,W*.86,H*.27,44,'#d4566a','#f48fa355',70);flower(c,W*.86,H*.76,46,'#d4566a','#f48fa355',70);
+  sparkle(c,W*.8,H*.18,24,'#e86f86',4);sparkle(c,W*.2,H*.12,20,'#e86f86',4);sparkle(c,W*.88,H*.7,22,'#e86f86',4);
+  rectW(c,g.x0-24,g.y0-24,g.s+48,g.s+48,'#d4566a',5,'#ffffffdd');
+  art(c,img,g.x0,g.y0,g.s,g.s);
+  const ry=g.y0+g.s+50;
+  wl(c,[[70,ry],[W/2,ry-8],[W-70,ry],[W-118,ry+70],[W-70,ry+150],[W/2,ry+158],[70,ry+150],[118,ry+70]],'#d4566a',5,1,true,'#ffffff');
+  tx(c,L[0],W/2,ry+104,100,700,'#c43d58','center',W-340);
+  [1,2,3].forEach(i=>{const y=ry+262+(i-1)*92;line(c,90,y+16,W-90,y+16,'#d4566a',2.5,.4);tx(c,L[i],110,y,60,500,'#b5384f','left',W-220)});
+  sig(c,INKS[1]);
+},
+// 3 Chalk Night
+(c,img,L,g)=>{
+  paper(c,'#154c3c','#ffffff',3200);
+  const ch='#f4f1e4';
+  [[.12,.1],[.86,.08],[.9,.3],[.08,.45],[.9,.74],[.14,.8],[.7,.04]].forEach(([x,y],i)=>star(c,W*x,H*y,22+i%3*8,ch,4));
+  sparkle(c,W*.8,H*.2,22,ch,4);sparkle(c,W*.2,H*.22,18,ch,4);
+  const mx=W*.82,my=H*.13;wl(c,(()=>{const p=[];for(let a=.9;a<5.4;a+=.3)p.push([mx+Math.cos(a)*60,my+Math.sin(a)*60]);for(let a=5.4;a>.9;a-=.3)p.push([mx+30+Math.cos(a)*48,my-8+Math.sin(a)*48]);return p})(),ch,4,1,true);
+  sprout(c,W*.1,H*.93,110,ch,'#4aa87a55');sprout(c,W*.9,H*.9,90,ch,'#4aa87a55');
+  const cx=W/2,cy=g.y0+g.s/2;
+  c.save();c.translate(cx,cy);c.rotate(-.03);
+  c.shadowColor='#0006';c.shadowBlur=30;c.shadowOffsetY=14;c.fillStyle='#f7f1e3';c.fillRect(-g.s/2-30,-g.s/2-30,g.s+60,g.s+60);c.shadowColor='transparent';
+  c.translate(-cx,-cy);art(c,img,g.x0,g.y0,g.s,g.s);c.restore();
+  tape(c,cx-g.s*.38,g.y0-34,180,54,-.5,'#ffd16699');tape(c,cx+g.s*.38,g.y0-30,180,54,.45,'#ffd16699');
+  sig(c,ch);
+  const ty=g.ty+55;
+  tx(c,L[0],90,ty,150,700,ch,'left',W-180);line(c,90,ty+26,W*.6,ty+26,ch,4,.8);line(c,100,ty+42,W*.52,ty+42,ch,3,.6);
+  [1,2,3].forEach(i=>tx(c,L[i],90,ty+130+(i-1)*84,60,500,ch,'left',W-180));
+},
+// 4 Sunny Scrapbook
+(c,img,L,g)=>{
+  paper(c,'#fff3c4','#a07a20');
+  blob(c,W*.15,H*.12,420,340,'#ffd166',.5);blob(c,W*.9,H*.55,380,420,'#ffb4a2',.4);blob(c,W*.2,H*.88,420,360,'#ffd166',.45);
+  const sx=W*.82,sy=H*.075;oval(c,sx,sy,48,48,'#e08a00',5,'#ffd16688');
+  for(let i=0;i<10;i++){const a=i*.628;line(c,sx+Math.cos(a)*68,sy+Math.sin(a)*68,sx+Math.cos(a)*100,sy+Math.sin(a)*100,'#e08a00',5)}
+  star(c,W*.1,H*.2,26,'#e08a00',4,'#ffd16688');star(c,W*.9,H*.3,22,'#e08a00',4,'#ffd16688');sparkle(c,W*.86,H*.74,24,'#e08a00',4);
+  const cx=W/2,cy=g.y0+g.s/2;
+  c.save();c.translate(cx,cy);c.rotate(.025);
+  c.shadowColor='#0004';c.shadowBlur=28;c.shadowOffsetY=14;c.fillStyle='#ffffff';c.fillRect(-g.s/2-34,-g.s/2-34,g.s+68,g.s+68+60);c.shadowColor='transparent';
+  c.translate(-cx,-cy);art(c,img,g.x0,g.y0,g.s,g.s);c.restore();
+  tape(c,cx,g.y0-40,200,56,-.06,'#ff9f4388');
+  sig(c,INKS[3]);
+  const ty=g.ty+100;
+  tx(c,L[0],90,ty,150,700,'#5a3d1e','left',W-180,'#ffb347');
+  [1,2,3].forEach(i=>tx(c,L[i],90,ty+115+(i-1)*84,60,500,'#5a3d1e','left',W-180));
+},
+// 5 Blue Sky
+(c,img,L,g)=>{
+  paper(c,'#e4f1ff','#6a8fb8');
+  blob(c,W*.2,H*.1,420,340,'#bfe0ff',.6);blob(c,W*.85,H*.6,400,420,'#cfe8ff',.6);
+  cloud(c,W*.2,H*.045,230,'#7aa6d6','#ffffffcc');cloud(c,W*.84,H*.2,210,'#7aa6d6','#ffffffcc');cloud(c,W*.84,H*.66,190,'#7aa6d6','#ffffffcc');cloud(c,W*.88,H*.88,240,'#7aa6d6','#ffffffcc');
+  // dashed flight path + paper plane
+  c.save();c.setLineDash([20,18]);wl(c,[[W*.15,H*.9],[W*.3,H*.85],[W*.4,H*.92],[W*.55,H*.84],[W*.65,H*.8]],'#1d4e89',4,.7);c.setLineDash([]);c.restore();
+  wl(c,[[W*.65,H*.8],[W*.78,H*.77],[W*.69,H*.82]],'#1d4e89',4,1,true,'#ffffffcc');line(c,W*.69,H*.82,W*.72,H*.84,'#1d4e89',4);
+  const cx=W/2,cy=g.y0+g.s/2;
+  cloud(c,cx,cy,g.s*1.08,'#7aa6d6','#ffffffee',5,.4);
+  art(c,img,g.x0,g.y0,g.s,g.s);
+  sig(c,INKS[4]);
+  const ty=g.ty+30;
+  tx(c,L[0],90,ty,150,700,'#1d4e89','left',W-180,'#9fd0ff');
+  [1,2,3].forEach(i=>tx(c,L[i],90,ty+115+(i-1)*84,60,500,'#1d4e89','left',W-180));
+}
+];
+
+function compose(img,poem){
+  lastPoem=poem;
+  const L=poem.split('\n').filter(Boolean);while(L.length<4)L.push('');
+  const o=$('out');W=1080;H=Math.round(W*BH()/BW());o.width=W;o.height=H;
+  const top=H*.105,bot=H*.875,avail=bot-top,s=Math.min(W*.78,avail-620),y0=top+(avail-(s+600))/2;
+  const g={s,x0:(W-s)/2,y0,ty:y0+s+120};
+  _s=tpl*977+13;
+  TPLS[tpl](o.getContext('2d'),img,L,g);
+  document.documentElement.style.setProperty('--ink',INKS[tpl]);
+}
+
+// ===== Save / Share (the screen-size card itself) =====
+const blob_=()=>new Promise(r=>$('out').toBlob(r,'image/png'));
+$('save').onclick=async()=>{const a=document.createElement('a');a.href=URL.createObjectURL(await blob_());a.download='my-miracle.png';a.click()};
+async function share(text){
+  const f=new File([await blob_()],'my-miracle.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],text});
+  else if(navigator.share)await navigator.share({text});
+  else $('save').click();
+}
+$('share').onclick=()=>share(lastPoem.replace(/\n/g,' ')).catch(()=>{});
+$('joy').onclick=()=>share('I made a little miracle today. Sending you some hope. Draw yours back?').catch(()=>{});
+$('again').onclick=()=>{strokes=[];window._img=null;$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
+
+applyTheme();fit();
+</script>
+</body>
+</html>
