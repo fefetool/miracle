@@ -8,8 +8,8 @@
 <style>
 :root{--bg:#ffffff;--ink:#222222}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Caveat','Patrick Hand',cursive;color:var(--ink)}
-html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);touch-action:none}
-#phone{position:relative;width:100%;height:100%;overflow:hidden;background:var(--bg);transition:background .3s}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body{position:fixed;inset:0;width:100%}
+#phone{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);transition:background .3s}
 @media (min-width:600px){
   html,body{background:#d9d9de;display:flex;align-items:center;justify-content:center}
   #phone{height:min(844px,96vh);width:auto;aspect-ratio:390/844;border:10px solid #111;border-radius:52px;box-shadow:0 20px 60px #0003}
@@ -106,6 +106,7 @@ function redraw(){
 }
 addEventListener('resize',fit);
 const pt=e=>{const r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+['touchmove','gesturestart'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 pad.onpointerdown=e=>{pad.setPointerCapture(e.pointerId);cur=[pt(e)];strokes.push(cur);redraw()};
 pad.onpointermove=e=>{if(!cur)return;cur.push(pt(e));redraw()};
 pad.onpointerup=pad.onpointercancel=()=>{cur=null};
