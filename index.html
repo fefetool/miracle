@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v12</title>
+<title>Miracle v13</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
 <meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
@@ -465,19 +465,19 @@ function fullCard(c,img,L){
   c.save();c.shadowColor=sigInk==='#ffffff'?'#000a':'#fffc';c.shadowBlur=22;tx(c,'miracle.',64,H*.052,50,700,sigInk,'left');c.restore();
   const row=(t,xx,yy,sz,wt,col,a,mw)=>tx(c,t,xx,yy,sz,wt,col,a,mw||M);
   c.save();c.shadowColor=glow;c.shadowBlur=26;
-  if(lay==='stack'){const y=H*.735;row(L[0],x,y,150,hw,ink,al);[1,2,3].forEach(i=>row(L[i],x,y+105+(i-1)*84,60,bw,ink,al))}
-  else if(lay==='poster'){const y=H*.725;try{c.letterSpacing='9px'}catch(e){}row(L[0].toUpperCase(),x,y,92,hw,ink,al);try{c.letterSpacing='0px'}catch(e){}
+  const LIM=H*.855;/* nothing below this line: the nav icons live under it */
+  if(lay==='stack'){const y=LIM-285;row(L[0],x,y,150,hw,ink,al);[1,2,3].forEach(i=>row(L[i],x,y+105+(i-1)*84,60,bw,ink,al))}
+  else if(lay==='poster'){const y=LIM-292;try{c.letterSpacing='9px'}catch(e){}row(L[0].toUpperCase(),x,y,92,hw,ink,al);try{c.letterSpacing='0px'}catch(e){}
     const x1=al==='left'?90:al==='right'?W-390:W*.32,x2=al==='left'?390:al==='right'?W-90:W*.68;c.save();c.shadowBlur=0;line(c,x1,y+34,x2,y+34,ink,4,.9);c.restore();
     [1,2,3].forEach(i=>row(L[i],x,y+112+(i-1)*84,62,bw,ink,al))}
-  else if(lay==='quote'){const y=H*.745;c.save();c.shadowBlur=0;sparkle(c,W/2,y-(lang==='en'?92:150),30,ink,5);c.restore();
-    row(L[0],W/2,y,108,hw,ink,'center');[1,2,3].forEach(i=>row(L[i],W/2,y+92+(i-1)*88,70,bw,ink,'center'));
-    c.save();c.shadowBlur=0;sparkle(c,W/2,y+92+3*88-20,22,ink,4);c.restore()}
-  else if(lay==='ribbon'){const by=H*.69;c.save();c.shadowColor='#0004';c.shadowBlur=18;c.shadowOffsetY=8;rectW(c,60,by,W-120,190,paperInk,5,'#fffdf5ee');c.restore();
-    c.save();c.shadowBlur=0;row(L[0],al==='left'?100:al==='right'?W-100:W/2,by+128,130,hw,paperInk,al,W-240);c.restore();
-    [1,2,3].forEach(i=>row(L[i],x,by+300+(i-1)*84,62,bw,ink,al))}
-  else{const by=H*.685,bh=H*.265;c.save();c.shadowColor='#0004';c.shadowBlur=22;c.shadowOffsetY=10;rectW(c,60,by,W-120,bh,paperInk,4,'#fffdf5f2');c.restore();
-    c.save();c.shadowBlur=0;tape(c,W/2,by,200,52,-.05,'#ffb4a2aa');row(L[0],110,by+112,118,hw,paperInk,'left',W-220);
-    [1,2,3].forEach(i=>row(L[i],110,by+190+(i-1)*70,56,bw,paperInk,'left',W-220));c.restore()}
+  else if(lay==='quote'){const y=LIM-320;c.save();c.shadowBlur=0;sparkle(c,W/2,y-(lang==='en'?92:150),30,ink,5);c.restore();
+    row(L[0],W/2,y,108,hw,ink,'center');[1,2,3].forEach(i=>row(L[i],W/2,y+92+(i-1)*88,70,bw,ink,'center'))}
+  else if(lay==='ribbon'){const by=LIM-470,tx0=al==='left'?100:al==='right'?W-100:W/2;c.save();c.shadowColor='#0004';c.shadowBlur=18;c.shadowOffsetY=8;rectW(c,60,by,W-120,170,paperInk,5,'#fffdf5ee');c.restore();
+    c.save();c.shadowBlur=0;row(L[0],tx0,by+118,120,hw,paperInk,al,W-240);c.restore();
+    [1,2,3].forEach(i=>row(L[i],x,by+290+(i-1)*84,62,bw,ink,al))}
+  else{const bh=410,by=LIM-bh;c.save();c.shadowColor='#0004';c.shadowBlur=22;c.shadowOffsetY=10;rectW(c,60,by,W-120,bh,paperInk,4,'#fffdf5f2');c.restore();
+    c.save();c.shadowBlur=0;tape(c,W/2,by,200,52,-.05,'#ffb4a2aa');row(L[0],110,by+120,118,hw,paperInk,'left',W-220);
+    [1,2,3].forEach(i=>row(L[i],110,by+205+(i-1)*72,56,bw,paperInk,'left',W-220));c.restore()}
   c.restore();
   return navInk;
 }
