@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v11</title>
+<title>Miracle v12</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
 <meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
@@ -37,6 +37,16 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #out{position:absolute;inset:0;width:100%;height:100%;display:block}
 #busy{position:absolute;inset:0;background:var(--bg);opacity:.92;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;z-index:5}
 #busy[hidden]{display:none}
+
+#sheet[hidden],#imgv[hidden]{display:none}
+#sheet{position:absolute;inset:0;z-index:20;background:#0006;display:flex;align-items:flex-end}
+.sh{width:100%;padding:26px 10px calc(26px + env(safe-area-inset-bottom));background:#fffdf5;border-radius:30px 30px 0 0;display:flex;justify-content:space-around;box-shadow:0 -10px 40px #0003}
+.sh button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:25px;font-weight:700;color:#3a3a4a;padding:4px 6px;line-height:1}
+.sh svg{width:50px;height:50px;stroke:#3a3a4a;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#imgv{position:absolute;inset:0;z-index:30;background:#111;display:flex;align-items:center;justify-content:center}
+#imgv img{max-width:100%;max-height:100%;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;touch-action:manipulation}
+#imgv .x{position:absolute;top:calc(14px + env(safe-area-inset-top));left:14px;width:44px;height:44px;background:#0006;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}
+#imgv .x svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
 </style>
 </head>
 <body>
@@ -65,6 +75,14 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 </section>
 
 <div id="busy" hidden>dreaming...</div>
+<div id="sheet" hidden><div class="sh">
+<button data-a="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg><span></span></button>
+<button data-a="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg><span></span></button>
+<button data-a="line"><svg viewBox="0 0 48 48"><path d="M24 8C13 8 6 15 6 23C6 30 12 35 19 36L19 42L26 36C36 35 42 29 42 23C42 15 35 8 24 8Z"/><path d="M16 22L32 22"/></svg><span></span></button>
+<button data-a="copy"><svg viewBox="0 0 48 48"><path d="M17 17L38 17L38 41L17 41Z"/><path d="M12 33L10 33L10 8L31 8L31 11"/></svg><span></span></button>
+</div></div>
+<div id="imgv" hidden><button class="x" aria-label="close"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19"/></svg></button><img alt=""></div>
+
 </div>
 <script>
 // ===== Config: Edge Function on the UTRA Supabase project =====
@@ -477,15 +495,33 @@ function compose(img,poem){
 
 // ===== Save / Share (the screen-size card itself) =====
 const blob_=()=>new Promise(r=>$('out').toBlob(r,'image/png'));
-$('save').onclick=async()=>{const a=document.createElement('a');a.href=URL.createObjectURL(await blob_());a.download='my-miracle.png';a.click()};
-async function share(text){
-  const f=new File([await blob_()],'my-miracle.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],text});
-  else if(navigator.share)await navigator.share({text});
-  else $('save').click();
+const SH={en:['Share','Save image','LINE','Copy link'],zh:['分享','存圖','LINE','複製連結'],ja:['シェア','画像を保存','LINE','リンクをコピー']};
+const JOY={en:'I made a little miracle today. Sending you some hope. Draw yours back?',zh:'我今天畫了一個小小的奇蹟，把一點希望送給你。你也畫一幅回我好嗎？',ja:'今日、小さな奇跡を描きました。あなたにも希望を。あなたの奇跡も見せてね。'};
+let shText='';
+const pageUrl=()=>location.origin+location.pathname;
+const fileOf=async()=>new File([await blob_()],'my-miracle.png',{type:'image/png'});
+function openSheet(text){shText=text;document.querySelectorAll('#sheet button').forEach((b,i)=>b.querySelector('span').textContent=SH[lang][i]);$('sheet').hidden=false}
+async function showImg(){$('imgv').querySelector('img').src=URL.createObjectURL(await blob_());$('imgv').hidden=false}
+const desktop=()=>!matchMedia('(pointer:coarse)').matches;
+async function saveImg(){if(desktop()){const a=document.createElement('a');a.href=URL.createObjectURL(await blob_());a.download='my-miracle.png';a.click()}else await showImg()}
+async function doShare(){
+  const f=await fileOf();
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:shText});return}
+    if(navigator.share){await navigator.share({text:shText,url:pageUrl()});return}}catch(e){if(e&&e.name==='AbortError')return}
+  await saveImg();
 }
-$('share').onclick=()=>share(lastPoem.replace(/\n/g,' ')).catch(()=>{});
-$('joy').onclick=()=>share('I made a little miracle today. Sending you some hope. Draw yours back?').catch(()=>{});
+$('sheet').onclick=async e=>{
+  const b=e.target.closest('button');if(!b){if(e.target===$('sheet'))$('sheet').hidden=true;return}
+  const a=b.dataset.a;
+  if(a==='share'){$('sheet').hidden=true;await doShare()}
+  else if(a==='save'){$('sheet').hidden=true;await saveImg()}
+  else if(a==='line'){$('sheet').hidden=true;location.href='https://line.me/R/msg/text/?'+encodeURIComponent(shText+' '+pageUrl())}
+  else if(a==='copy'){try{await navigator.clipboard.writeText(shText+' '+pageUrl());b.querySelector('span').textContent='✓'}catch(er){}setTimeout(()=>{$('sheet').hidden=true},700)}
+};
+$('imgv').querySelector('.x').onclick=()=>{$('imgv').hidden=true};
+$('save').onclick=()=>saveImg();
+$('share').onclick=()=>openSheet(lastPoem.replace(/\n/g,' · '));
+$('joy').onclick=()=>openSheet(JOY[lang]);
 $('again').onclick=()=>{strokes=[];window._img=null;$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
 
 document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[lang]);$('busy').textContent=BUSY[lang];
