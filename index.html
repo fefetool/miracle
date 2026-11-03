@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v5</title>
+<title>Miracle v6</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ffffff;--ink:#222222}
@@ -139,9 +139,9 @@ $('miracle').onclick=async()=>{
         headers:{'Content-Type':'application/json',Authorization:'Bearer '+SUPABASE_ANON_KEY},
         body:JSON.stringify((()=>{const image=snapshot();return{image,width:window._crop.pw,height:window._crop.ph}})())});
       const j=await res.json();
-      if(!j.svg)throw new Error(j.error||'fail');
+      if(!j.image&&!j.svg)throw new Error(j.error||'fail');
       poem=j.poem||poem;
-      img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(j.svg)});
+      img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=j.image||('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(j.svg))});window._redraw=!!j.image;
     }else await new Promise(r=>setTimeout(r,1200));
     window._img=img;
     compose(img,poem);
@@ -240,6 +240,7 @@ function art(c,img,x,y,w,h){
     if(!k){const s=Math.min(w/img.width,h/img.height),iw=img.width*s,ih=img.height*s;c.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);return}
     // AI colouring layer first, then the person's own original lines on top: it is still their drawing
     const s=Math.min(w/k.w,h/k.h),ox=x+(w-k.w*s)/2,oy=y+(h-k.h*s)/2;
+    if(window._redraw){c.save();c.globalCompositeOperation='multiply';c.drawImage(img,ox,oy,k.w*s,k.h*s);c.restore();return}
     c.drawImage(img,ox,oy,k.w*s,k.h*s);
     strokes.forEach(st=>{const p=st.map(q=>[(q.x-k.x0)*s+ox,(q.y-k.y0)*s+oy]);if(p.length<2)p.push([p[0][0]+1,p[0][1]]);
       wl(c,p,'#2f2f2f',Math.max(5,3.4*s),.92)});
