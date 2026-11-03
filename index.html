@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v7</title>
+<title>Miracle v8</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ffffff;--ink:#222222}
@@ -117,14 +117,15 @@ $('clear').onclick=()=>{strokes=[];redraw()};
 function snapshot(){
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   strokes.forEach(s=>s.forEach(q=>{x0=Math.min(x0,q.x);y0=Math.min(y0,q.y);x1=Math.max(x1,q.x);y1=Math.max(y1,q.y)}));
-  const m=Math.max(x1-x0,y1-y0)*.12+24;x0-=m;y0-=m;x1+=m;y1+=m;
-  const bw=x1-x0,bh=y1-y0,s=Math.min(1,768/Math.max(bw,bh)),t=document.createElement('canvas');
-  t.width=Math.round(bw*s);t.height=Math.round(bh*s);const x=t.getContext('2d');
-  x.fillStyle='#fff';x.fillRect(0,0,t.width,t.height);
-  x.strokeStyle='#222';x.lineWidth=4;x.lineCap=x.lineJoin='round';
-  strokes.forEach(st=>{x.beginPath();st.forEach((q,i)=>i?x.lineTo((q.x-x0)*s,(q.y-y0)*s):x.moveTo((q.x-x0)*s,(q.y-y0)*s));
-    if(st.length==1)x.lineTo((st[0].x-x0)*s+.1,(st[0].y-y0)*s);x.stroke()});
-  window._crop={x0,y0,w:bw,h:bh,pw:t.width,ph:t.height};
+  const PW=576,PH=1024,bw=Math.max(x1-x0,40),bh=Math.max(y1-y0,40);
+  const bx=PW*.12,by=PH*.09,bW=PW*.76,bH=PH*.56,s=Math.min(bW/bw,bH/bh);
+  const ox=bx+(bW-bw*s)/2-x0*s,oy=by+(bH-bh*s)/2-y0*s;
+  const t=document.createElement('canvas');t.width=PW;t.height=PH;const x=t.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,PW,PH);
+  x.strokeStyle='#222';x.lineWidth=7;x.lineCap=x.lineJoin='round';
+  strokes.forEach(st=>{x.beginPath();st.forEach((q,i)=>i?x.lineTo(q.x*s+ox,q.y*s+oy):x.moveTo(q.x*s+ox,q.y*s+oy));
+    if(st.length==1)x.lineTo(st[0].x*s+ox+.1,st[0].y*s+oy);x.stroke()});
+  window._crop={pw:PW,ph:PH};
   return t.toDataURL('image/png');
 }
 
@@ -414,6 +415,23 @@ T({bg:'#fbeedc',speck:'#9a6a3a',ink:'#9a4a1c',hc:'#8a3d14',hl:'#ffd09a',tc:'#9a4
     .forEach(([x,y,l,a,col])=>leaf(c,W*x,H*y,l,a,col,col+'66'));sparkle(c,W*.8,H*.3,22,'#c9a44c',4);sparkle(c,W*.2,H*.3,20,'#c9a44c',4)}})
 ];
 
+
+// AI picture fills the whole card; the poem is written on its calm lower part
+function fullCard(c,img,L){
+  const sc=Math.max(W/img.width,H/img.height),iw=img.width*sc,ih=img.height*sc;
+  c.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
+  const d=c.getImageData(0,Math.floor(H*.68),W,Math.floor(H*.28)).data;let lum=0,n=0;
+  for(let i=0;i<d.length;i+=64){lum+=.299*d[i]+.587*d[i+1]+.114*d[i+2];n++}lum/=n*255;
+  const dark=lum>.52,ink=dark?'#2b2d42':'#ffffff',glow=dark?'#ffffffcc':'#000000aa';
+  const g=c.createLinearGradient(0,H*.6,0,H);g.addColorStop(0,'#0000');g.addColorStop(1,dark?'#ffffff66':'#00000066');c.fillStyle=g;c.fillRect(0,H*.6,W,H*.4);
+  const al=['center','left','right'][tpl%3],x=al==='left'?90:al==='right'?W-90:W/2;
+  c.save();c.shadowColor=glow;c.shadowBlur=26;
+  tx(c,'miracle.',64,H*.052,50,700,ink,'left');
+  const y=H*.74;
+  tx(c,L[0],x,y,150,700,ink,al,W-180);
+  [1,2,3].forEach(i=>tx(c,L[i],x,y+105+(i-1)*84,60,500,ink,al,W-180));
+  c.restore();return ink;
+}
 function compose(img,poem){
   lastPoem=poem;
   const L=poem.split('\n').filter(Boolean);while(L.length<4)L.push('');
@@ -421,6 +439,7 @@ function compose(img,poem){
   const top=H*.105,bot=H*.875,avail=bot-top,s=Math.min(W*.78,avail-620),y0=top+(avail-(s+600))/2;
   const g={s,x0:(W-s)/2,y0,ty:y0+s+120};
   _s=tpl*977+13;
+  if(img&&window._redraw){document.documentElement.style.setProperty('--ink',fullCard(o.getContext('2d'),img,L));return}
   TPLS[tpl](o.getContext('2d'),img,L,g);
   document.documentElement.style.setProperty('--ink',INKS[tpl]);
 }
