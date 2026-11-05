@@ -7,10 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
 <meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon2-180.png"><meta property="og:title" content="miracle."><meta property="og:description" content="Draw how you feel. Get a picture and a poem made for you."><meta property="og:type" content="website"><meta property="og:url" content="https://miracle-mx1.pages.dev/"><meta property="og:image" content="https://miracle-mx1.pages.dev/og.png?v=2"><meta property="og:image:width" content="630"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://miracle-mx1.pages.dev/og.png?v=2"><meta name="description" content="Draw how you feel. Get a picture and a poem made for you."><link rel="icon" href="icon2-180.png">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Gochi+Hand&family=Dancing+Script:wght@500;700&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Amatic+SC:wght@400;700&family=Indie+Flower&family=Kalam:wght@400;700&family=Pacifico&family=Satisfy&family=LXGW+WenKai+TC:wght@400;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Gochi+Hand&family=Yuji+Boku&family=Dancing+Script:wght@500;700&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Amatic+SC:wght@400;700&family=Indie+Flower&family=Kalam:wght@400;700&family=Pacifico&family=Satisfy&family=LXGW+WenKai+TC:wght@400;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ffffff;--ink:#222222}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Gochi Hand',cursive;color:var(--ink)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Gochi Hand','Yuji Boku','LXGW WenKai TC',cursive;color:var(--ink)}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}body{position:fixed;top:0;left:0;width:100%;height:100vh;height:100dvh;height:var(--vh,100dvh)}
 #phone{position:relative;width:100%;height:100vh;height:100dvh;height:var(--vh,100dvh);overflow:hidden;background:var(--bg);transition:background .3s}
 @media (min-width:600px){
@@ -41,7 +41,7 @@ button.logo{background:none;border:0;padding:0;text-align:left}
 /* result card = full screen */
 .fade{position:absolute;left:0;right:0;bottom:0;height:calc(15% + env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(255,255,255,0),var(--bg) 78%);pointer-events:none;z-index:2}
 #out{position:absolute;inset:0;width:100%;height:100%;display:block}
-#busy{position:absolute;inset:0;background:var(--bg);opacity:.96;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:38px;font-weight:700;z-index:5}
+#busy{position:absolute;inset:0;background:var(--bg);opacity:.96;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:22px;font-weight:700;z-index:5}
 #busy canvas{width:min(78vw,300px);height:min(78vw,300px)}
 #busy[hidden]{display:none}
 
@@ -56,7 +56,7 @@ button.logo{background:none;border:0;padding:0;text-align:left}
 #imgv .x svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
 
 #tour{position:absolute;inset:0;z-index:40;overflow:hidden}
-#tour *{font-family:'Gochi Hand',cursive;color:#3a3a4a}
+#tour *{font-family:'Gochi Hand','Yuji Boku',cursive;color:#3a3a4a}
 #tour .hole{position:absolute;border-radius:26px;box-shadow:0 0 0 2400px rgba(12,12,40,.64);border:3px dashed #fffc;transition:left .35s,top .35s,width .35s,height .35s}
 #tour .bub{position:absolute;background:#fffdf5;border:3px solid #3a3a4a;border-radius:28px 32px 26px 34px;padding:16px 18px 14px 16px;box-shadow:0 10px 30px #0005;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
 #tour .bub .in{animation:bob 1.8s ease-in-out infinite;display:block}
@@ -135,7 +135,7 @@ const FUNCTION_NAME = 'miracle';
 
 let lang='en';try{lang=localStorage.getItem('mr_lang')||'en'}catch(e){}
 const LANGS=['en','zh','ja'],LBL={en:'EN',zh:'中',ja:'日'},BUSY={en:'dreaming...',zh:'靜靜醞釀中…',ja:'夢を描いています…'},ERR={en:'please try again',zh:'請再試一次',ja:'もう一度お試しください'};
-const LANGF={zh:['LXGW WenKai TC',[700,400]],ja:['Klee One',[600,400]]};
+const LANGF={zh:['Yuji Boku',[400,400]],ja:['Klee One',[600,400]]};
 const loadF=(f,t)=>Promise.all([700,600,500,400].map(w=>document.fonts.load(`${w} 80px "${f}"`,t||'')));
 const okPoem=p=>typeof p==='string'&&p.split('\n').filter(x=>x.trim()).length>=4;
 function poemOf(){const P=window._poems;if(!P)return null;return okPoem(P[lang])?P[lang]:(okPoem(P.en)?P.en:(okPoem(P.zh)?P.zh:null))}
@@ -591,7 +591,7 @@ function lumOf(c,y0,h){const d=c.getImageData(0,Math.floor(y0),W,Math.floor(h)).
 function fullCard(c,img,L){
   const sc=Math.max(W/img.width,H/img.height),iw=img.width*sc,ih=img.height*sc;
   c.drawImage(img,(W-iw)/2,(H-ih)/2,iw,ih);
-  const d=window._design||{},fn=LANGF[lang]?LANGF[lang][0]:(FONTS[d.font]?d.font:'Gochi Hand'),[hw,bw]=LANGF[lang]?LANGF[lang][1]:FONTS[fn];F=`'${fn}', cursive`;
+  const d=window._design||{},fn=LANGF[lang]?LANGF[lang][0]:(FONTS[d.font]?d.font:'Gochi Hand'),[hw,bw]=LANGF[lang]?LANGF[lang][1]:FONTS[fn];F=`'${fn}',${fn==='Yuji Boku'?"'LXGW WenKai TC',":''}cursive`;
   const lay=['stack','poster','quote','ribbon','note'].includes(d.layout)?d.layout:'stack',al=['left','center','right'].includes(d.align)?d.align:'center';
   const dk=lumOf(c,H*.68,H*.28)>.52,ink=dk?'#2b2d42':'#ffffff',glow=dk?'#ffffffcc':'#000000aa',paperInk='#3a3a4a';
   const sigInk=lumOf(c,0,H*.09)>.52?'#2b2d42':'#ffffff',navInk=lumOf(c,H*.9,H*.1)>.52?'#2b2d42':'#ffffff';
@@ -659,7 +659,7 @@ const STORY={
  ja:{h:'miracle を作った理由',p:['誰にでも、口に出すには重すぎる日があります。そんな日に、大切な人へその重さを渡したくなくて、でも平気なふりもしたくありませんでした。','だから、静かな場所を作りました。気持ちを自由に描くだけ。ルールも上手さもいりません。miracle は、あなたの線の中に隠れている小さな光を見つけて、あなただけの一枚の絵と、いくつかの言葉にして返します。','よければ、同じように重い日を過ごしているかもしれない誰かへ送ってください。悲しみではなく、光だけを。','あなたが引いた一本の線は、もう十分に勇気ある一本です。来てくれてありがとう。'],by:'miracle をつくった人',mail:'メッセージを送る'}};
 const MAIL='elainsmail@gmail.com';
 function openStory(){
-  const d=STORY[lang],f=lang==='zh'?"'LXGW WenKai TC'":lang==='ja'?"'Klee One'":"'Gochi Hand'";
+  const d=STORY[lang],f=lang==='zh'?"'Yuji Boku','LXGW WenKai TC'":lang==='ja'?"'Klee One'":"'Gochi Hand'";
   const box=$('story').querySelector('.in');box.style.fontFamily=f+',cursive';
   box.innerHTML=`<h2 style="font-family:${f},cursive">${d.h}</h2>`+d.p.map(t=>`<p style="font-family:${f},cursive">${t}</p>`).join('')+`<p class="by" style="font-family:${f},cursive">— ${d.by}</p><a class="mail" style="font-family:${f},cursive" href="mailto:${MAIL}?subject=${encodeURIComponent('Hello from miracle')}"><svg viewBox="0 0 48 48"><path d="M6 12L42 12L42 38L6 38Z"/><path d="M6 13L24 28L42 13"/></svg>${d.mail}</a><div class="addr">${MAIL}</div>`;
   $('story').hidden=false;$('story').querySelector('.card').scrollTop=0;
@@ -678,7 +678,7 @@ const TOUR={
  dot:['Tap the dot to change the text design','點這個圓點，換一種文字設計','丸をタップすると文字のデザインが変わります'],
  new:['Draw a new one here','在這裡畫新的一幅','ここで新しく描けます'],
  next:['Next','下一步','次へ'],ok:['Got it','知道了','わかった']};
-const TFONT=["'Gochi Hand'","'LXGW WenKai TC'","'Klee One'"];
+const TFONT=["'Gochi Hand'","'Yuji Boku','LXGW WenKai TC'","'Klee One'"];
 const TSTEPS={draw:[['pad','pad'],['#draw .lang','lang'],['#draw .logo','story'],['#miracle','go']],result:[['#result .bottom','bar'],['#theme2','dot'],['#again','new']]};
 const tget=k=>{try{return localStorage.getItem('mr_tour_'+k)==='1'}catch(e){return false}},tset=k=>{try{localStorage.setItem('mr_tour_'+k,'1')}catch(e){}};
 let tourOn=false;
