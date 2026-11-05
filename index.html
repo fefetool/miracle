@@ -628,7 +628,7 @@ function compose(img,poem){
 
 // ===== Save / Share (the screen-size card itself) =====
 const blob_=()=>new Promise(r=>$('out').toBlob(r,'image/png'));
-const pageUrl=()=>location.origin+location.pathname;
+const pageUrl=()=>location.origin+location.pathname+'?openExternalBrowser=1';
 const fileOf=async()=>new File([await blob_()],'my-miracle.png',{type:'image/png'});
 async function showImg(){$('imgv').querySelector('img').src=URL.createObjectURL(await blob_());$('imgv').hidden=false}
 const desktop=()=>!matchMedia('(pointer:coarse)').matches;
