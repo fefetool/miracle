@@ -320,7 +320,7 @@ $('miracle').onclick=async()=>{
     window._img=img;tpl=Math.floor(Math.random()*TPLS.length);
     compose(img,poem);
     pad.style.display='none';$('draw').hidden=true;$('result').hidden=false;setTimeout(()=>runTour('result'),900);
-  }catch(err){window._poems=null;window._redraw=false;alert(ERR[lang])}
+  }catch(err){window._poems=null;window._redraw=false;console.error(err);alert(ERR[lang]+'\n['+String(err&&err.message||err).slice(0,120)+']')}
   stopBusy();
 };
 
