@@ -25,6 +25,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .screen[hidden]{display:none}
 .screen>*{pointer-events:auto}
 .logo{position:absolute;top:calc(14px + env(safe-area-inset-top));left:20px;font-size:34px;font-weight:700}
+.oval.again{width:56px;height:76px;border-width:3px;font-size:19px;padding:0;flex:none}
 .newb{position:absolute;top:calc(8px + env(safe-area-inset-top));right:108px;width:44px;height:44px;background:none;border:0;padding:0;display:flex;align-items:center;justify-content:center;z-index:3}
 .newb svg{width:28px;height:28px;stroke:var(--ink);fill:none;stroke-width:3.4;stroke-linecap:round}
 .storybtn{z-index:3}.storybtn.rs{position:absolute;top:calc(8px + env(safe-area-inset-top));left:8px;width:150px;height:56px;background:none;border:0;padding:0}
@@ -110,11 +111,11 @@ button.logo{background:none;border:0;padding:0;text-align:left}
 <section id="result" class="screen" hidden>
   <canvas id="out"></canvas>
   <button class="lang" aria-label="language">EN</button><button class="dot" id="theme2" aria-label="template"></button>
-  <button class="ico newb" id="again" aria-label="new"><svg viewBox="0 0 48 48"><path d="M24 8C25 18 23 30 24 40"/><path d="M8 24C18 25 30 23 40 24"/></svg></button>
   <button class="storybtn rs" aria-label="story"></button>
   <div class="bottom">
     <button class="ico" id="b-share" aria-label="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg></button>
     <button class="ico" id="b-save" aria-label="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg></button>
+    <button class="oval again" id="again" aria-label="again">again</button>
     <button class="ico" id="b-line" aria-label="LINE"><svg viewBox="0 0 48 48"><path d="M24 8C13 8 6 15 6 23C6 30 12 35 19 36L19 42L26 36C36 35 42 29 42 23C42 15 35 8 24 8Z"/><path d="M16 22L32 22"/></svg></button>
     <button class="ico" id="b-copy" aria-label="copy link"><svg viewBox="0 0 48 48"><path d="M17 17L38 17L38 41L17 41Z"/><path d="M12 33L10 33L10 8L31 8L31 11"/></svg></button>
   </div>
