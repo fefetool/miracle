@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Miracle v14</title>
+<title>miracle.</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Miracle">
-<meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><meta property="og:title" content="miracle."><meta property="og:description" content="Draw how you feel. Get a picture and a poem made for you."><meta property="og:type" content="website"><meta property="og:url" content="https://miracle-mx1.pages.dev/"><meta property="og:image" content="https://miracle-mx1.pages.dev/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://miracle-mx1.pages.dev/og.png"><meta name="description" content="Draw how you feel. Get a picture and a poem made for you."><link rel="icon" href="icon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Dancing+Script:wght@500;700&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Amatic+SC:wght@400;700&family=Indie+Flower&family=Kalam:wght@400;700&family=Pacifico&family=Satisfy&family=LXGW+WenKai+TC:wght@400;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ffffff;--ink:#222222}
@@ -25,6 +25,10 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .screen[hidden]{display:none}
 .screen>*{pointer-events:auto}
 .logo{position:absolute;top:calc(14px + env(safe-area-inset-top));left:20px;font-size:34px;font-weight:700}
+.newb{position:absolute;top:calc(8px + env(safe-area-inset-top));right:108px;width:44px;height:44px;background:none;border:0;padding:0;display:flex;align-items:center;justify-content:center;z-index:3}
+.newb svg{width:28px;height:28px;stroke:var(--ink);fill:none;stroke-width:3.4;stroke-linecap:round}
+.storybtn{z-index:3}.storybtn.rs{position:absolute;top:calc(8px + env(safe-area-inset-top));left:8px;width:150px;height:56px;background:none;border:0;padding:0}
+button.logo{background:none;border:0;padding:0;text-align:left}
 .lang{position:absolute;top:calc(11px + env(safe-area-inset-top));right:54px;background:none;border:0;padding:4px 8px;font-size:30px;font-weight:700;line-height:1;z-index:3;color:var(--ink)}
 .dot{position:absolute;top:calc(22px + env(safe-area-inset-top));right:20px;width:20px;height:20px;border-radius:50%;background:var(--ink);border:0;padding:0;z-index:3}
 .bottom{position:absolute;left:0;right:0;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;padding:0 14px}
@@ -35,10 +39,11 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .oval:active{transform:scale(.95)}
 /* result card = full screen */
 #out{position:absolute;inset:0;width:100%;height:100%;display:block}
-#busy{position:absolute;inset:0;background:var(--bg);opacity:.92;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;z-index:5}
+#busy{position:absolute;inset:0;background:var(--bg);opacity:.96;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:38px;font-weight:700;z-index:5}
+#busy canvas{width:min(78vw,300px);height:min(78vw,300px)}
 #busy[hidden]{display:none}
 
-#sheet[hidden],#imgv[hidden]{display:none}
+#imgv[hidden]{display:none}
 #sheet{position:absolute;inset:0;z-index:20;background:#0006;display:flex;align-items:flex-end}
 .sh{width:100%;padding:26px 10px calc(26px + env(safe-area-inset-bottom));background:#fffdf5;border-radius:30px 30px 0 0;display:flex;justify-content:space-around;box-shadow:0 -10px 40px #0003}
 .sh button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:25px;font-weight:700;color:#3a3a4a;padding:4px 6px;line-height:1}
@@ -49,19 +54,20 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 #imgv .x svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
 
 #tour{position:absolute;inset:0;z-index:40;overflow:hidden}
-#tour *{font-family:var(--tf),cursive;color:#3a3a4a}
+#tour *{font-family:'Caveat',cursive;color:#3a3a4a}
 #tour .hole{position:absolute;border-radius:26px;box-shadow:0 0 0 2400px rgba(12,12,40,.64);border:3px dashed #fffc;transition:left .35s,top .35s,width .35s,height .35s}
 #tour .bub{position:absolute;background:#fffdf5;border:3px solid #3a3a4a;border-radius:28px 32px 26px 34px;padding:16px 18px 14px 16px;box-shadow:0 10px 30px #0005;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
 #tour .bub .in{animation:bob 1.8s ease-in-out infinite;display:block}
 #tour .top{display:flex;align-items:center;gap:12px}
 #tour .mas{width:54px;height:54px;flex:none;animation:wave 1.4s ease-in-out infinite}
 #tour .mas svg{width:100%;height:100%}
-#tour .tt{font-size:26px;font-weight:700;line-height:1.25;padding-right:18px}
+#tour .tt{font-size:21px;font-weight:700;line-height:1.28;padding-right:18px}
+#tour .tt div{margin:1px 0}
 #tour .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
 #tour .dots{display:flex;gap:7px}
 #tour .dots i{width:10px;height:10px;border-radius:50%;background:#3a3a4a33}
 #tour .dots i.on{background:#e8657f}
-#tour .nx{background:none;border:0;display:flex;align-items:center;gap:6px;font-size:25px;font-weight:700;padding:2px 4px}
+#tour .nx{background:none;border:0;display:flex;align-items:center;gap:6px;font-size:21px;font-weight:700;padding:2px 4px}
 #tour .nx svg{width:30px;height:30px;stroke:#e8657f;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 #tour .cl{position:absolute;top:-14px;right:-12px;width:34px;height:34px;border-radius:50%;background:#fffdf5;border:3px solid #3a3a4a;padding:0;display:flex;align-items:center;justify-content:center}
 #tour .cl svg{width:16px;height:16px;stroke:#3a3a4a;fill:none;stroke-width:3.4;stroke-linecap:round}
@@ -69,6 +75,22 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 @keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes wave{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-3px)}}
+
+#story{position:absolute;inset:0;z-index:35;background:rgba(20,16,40,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center}
+#story[hidden]{display:none}
+#story .card{position:relative;width:min(88%,400px);max-height:76%;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;background:rgba(255,248,244,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:3px solid rgba(58,58,74,.55);border-radius:36px 40px 34px 42px;padding:64px 22px 20px;box-shadow:0 14px 50px #0004;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+#story .hr{position:absolute;top:10px;left:50%;margin-left:-26px;width:52px;height:48px;animation:beat 1.6s ease-in-out infinite}
+#story .hr path{fill:rgba(232,101,127,.55);stroke:#b5384f;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+#story *{color:#3a3a4a}
+#story h2{margin:0 0 8px;font-size:34px;line-height:1.1;text-align:center}
+#story p{margin:0 0 10px;font-size:23px;line-height:1.32;font-weight:500}
+#story .by{text-align:right;font-weight:700;margin-top:4px}
+#story .mail{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px auto 2px;width:max-content;max-width:100%;padding:8px 18px;border:3px solid #3a3a4a;border-radius:26px 30px 24px 32px;background:rgba(255,255,255,.7);text-decoration:none;font-size:24px;font-weight:700}
+#story .mail svg{width:28px;height:28px;stroke:#b5384f;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+#story .addr{text-align:center;font-size:19px;opacity:.75;margin:2px 0 0}
+#story .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.75);border:3px solid #3a3a4a;padding:0;display:flex;align-items:center;justify-content:center}
+#story .x svg{width:15px;height:15px;stroke:#3a3a4a;fill:none;stroke-width:3.4;stroke-linecap:round}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 </style>
 </head>
 <body>
@@ -76,7 +98,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <canvas id="pad"></canvas>
 
 <section id="draw" class="screen">
-  <div class="logo">miracle.</div>
+  <button class="logo storybtn" aria-label="story">miracle.</button>
   <button class="lang" aria-label="language">EN</button><button class="dot" id="theme" aria-label="theme"></button>
   <div class="bottom">
     <button class="ico" id="undo" aria-label="undo"><svg viewBox="0 0 48 48"><path d="M36 34C42 22 31 11 18 15C15 16 13 18 11 21"/><path d="M10 11L11 22L22 20"/></svg></button>
@@ -88,21 +110,18 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 <section id="result" class="screen" hidden>
   <canvas id="out"></canvas>
   <button class="lang" aria-label="language">EN</button><button class="dot" id="theme2" aria-label="template"></button>
+  <button class="ico newb" id="again" aria-label="new"><svg viewBox="0 0 48 48"><path d="M24 8C25 18 23 30 24 40"/><path d="M8 24C18 25 30 23 40 24"/></svg></button>
+  <button class="storybtn rs" aria-label="story"></button>
   <div class="bottom">
-    <button class="ico" id="save" aria-label="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg></button>
-    <button class="ico" id="share" aria-label="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg></button>
-    <button class="ico" id="joy" aria-label="send joy"><svg viewBox="0 0 48 48"><path d="M24 41C8 29 5 17 13 11C18 8 23 11 24 16C25 11 30 8 35 11C43 17 40 29 24 41Z"/></svg></button>
-    <button class="ico" id="again" aria-label="new"><svg viewBox="0 0 48 48"><path d="M24 7C25 18 23 30 24 41"/><path d="M8 24C18 25 30 23 41 24"/><path d="M36 9L40 13"/></svg></button>
+    <button class="ico" id="b-share" aria-label="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg></button>
+    <button class="ico" id="b-save" aria-label="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg></button>
+    <button class="ico" id="b-line" aria-label="LINE"><svg viewBox="0 0 48 48"><path d="M24 8C13 8 6 15 6 23C6 30 12 35 19 36L19 42L26 36C36 35 42 29 42 23C42 15 35 8 24 8Z"/><path d="M16 22L32 22"/></svg></button>
+    <button class="ico" id="b-copy" aria-label="copy link"><svg viewBox="0 0 48 48"><path d="M17 17L38 17L38 41L17 41Z"/><path d="M12 33L10 33L10 8L31 8L31 11"/></svg></button>
   </div>
 </section>
 
-<div id="busy" hidden>dreaming...</div>
-<div id="sheet" hidden><div class="sh">
-<button data-a="share"><svg viewBox="0 0 48 48"><path d="M7 24L41 8L31 41L23 29Z"/><path d="M23 29L41 8"/></svg><span></span></button>
-<button data-a="save"><svg viewBox="0 0 48 48"><path d="M24 7C25 17 23 24 24 31"/><path d="M15 23L24 32L33 22"/><path d="M9 33C9 41 12 42 24 42C36 42 39 41 39 33"/></svg><span></span></button>
-<button data-a="line"><svg viewBox="0 0 48 48"><path d="M24 8C13 8 6 15 6 23C6 30 12 35 19 36L19 42L26 36C36 35 42 29 42 23C42 15 35 8 24 8Z"/><path d="M16 22L32 22"/></svg><span></span></button>
-<button data-a="copy"><svg viewBox="0 0 48 48"><path d="M17 17L38 17L38 41L17 41Z"/><path d="M12 33L10 33L10 8L31 8L31 11"/></svg><span></span></button>
-</div></div>
+<div id="busy" hidden><canvas id="bz" width="600" height="600"></canvas><div id="bt">dreaming...</div></div>
+<div id="story" hidden><div class="card"><svg class="hr" viewBox="0 0 48 44"><path d="M24 40C8 28 3 17 10 9C16 3 23 7 24 13C25 7 32 3 38 9C45 17 40 28 24 40Z"/></svg><button class="x" aria-label="close"><svg viewBox="0 0 16 16"><path d="M3 3L13 13M13 3L3 13"/></svg></button><div class="in"></div></div></div>
 <div id="imgv" hidden><button class="x" aria-label="close"><svg viewBox="0 0 24 24"><path d="M5 5L19 19M19 5L5 19"/></svg></button><img alt=""></div>
 
 </div>
@@ -116,10 +135,11 @@ let lang='en';try{lang=localStorage.getItem('mr_lang')||'en'}catch(e){}
 const LANGS=['en','zh','ja'],LBL={en:'EN',zh:'中',ja:'日'},BUSY={en:'dreaming...',zh:'靜靜醞釀中…',ja:'夢を描いています…'},ERR={en:'please try again',zh:'請再試一次',ja:'もう一度お試しください'};
 const LANGF={zh:['LXGW WenKai TC',[700,400]],ja:['Klee One',[600,400]]};
 const loadF=(f,t)=>Promise.all([700,600,500,400].map(w=>document.fonts.load(`${w} 80px "${f}"`,t||'')));
-function poemOf(){const P=window._poems;return (P&&(P[lang]||P.en))||lastPoem}
+const okPoem=p=>typeof p==='string'&&p.split('\n').filter(x=>x.trim()).length>=4;
+function poemOf(){const P=window._poems;if(!P)return null;return okPoem(P[lang])?P[lang]:(okPoem(P.en)?P.en:(okPoem(P.zh)?P.zh:null))}
 async function setLang(l){
   lang=l;try{localStorage.setItem('mr_lang',l)}catch(e){}
-  document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[l]);$('busy').textContent=BUSY[l];
+  document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[l]);$('bt').textContent=BUSY[l];if(!$('story').hidden)openStory();
   if(window._img&&window._redraw&&window._poems){const t=poemOf();try{await loadF(LANGF[l]?LANGF[l][0]:(FONTS[(window._design||{}).font]?window._design.font:'Caveat'),t)}catch(e){}compose(window._img,t)}
 }
 document.querySelectorAll('.lang').forEach(b=>b.onclick=()=>setLang(LANGS[(LANGS.indexOf(lang)+1)%3]));
@@ -162,7 +182,7 @@ function redraw(){
 }
 addEventListener('resize',fit);
 const pt=e=>{const r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
-['touchmove','gesturestart'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+['touchmove','gesturestart'].forEach(t=>document.addEventListener(t,e=>{if(e.target.closest&&e.target.closest('#story .card'))return;e.preventDefault()},{passive:false}));
 pad.onpointerdown=e=>{pad.setPointerCapture(e.pointerId);cur=[pt(e)];strokes.push(cur);redraw()};
 pad.onpointermove=e=>{if(!cur)return;cur.push(pt(e));redraw()};
 pad.onpointerup=pad.onpointercancel=()=>{cur=null};
@@ -185,10 +205,101 @@ function snapshot(){
   return t.toDataURL('image/png');
 }
 
+
+// ===== Loading animations (random each time) =====
+const INK_='#3a3a4a';
+const bs=(c,col,w)=>{c.strokeStyle=col||INK_;c.lineWidth=w||4;c.lineCap=c.lineJoin='round'};
+function wob(c,pts,col,w,fill){c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));if(fill){c.fillStyle=fill;c.fill()}bs(c,col,w);c.stroke()}
+function eggPath(c,rx,ry){c.beginPath();for(let a=0;a<=6.3;a+=.12){const x=Math.cos(a)*rx,y=Math.sin(a)*ry*(Math.sin(a)<0?1.12:.95);a?c.lineTo(x,y):c.moveTo(x,y)}c.closePath()}
+const ZIG=(rx)=>{const p=[];for(let i=0;i<=6;i++)p.push([-rx*1.2+i*(rx*2.4/6),i%2?12:-12]);return p};
+function animEgg(c,t){
+  t=t%4.2;const cx=150,cy=165,rx=64,ry=82;
+  const tilt=t<2.7?Math.sin(t*9)*(.04+.22*Math.min(1,t/2.3)):0,brk=Math.max(0,t-2.7),cp=Math.max(0,Math.min(1,(t-1.5)/1.1)),fade=t>3.7?Math.max(0,1-(t-3.7)/.5):1;
+  c.save();c.globalAlpha=fade;
+  c.fillStyle='#0001';c.beginPath();c.ellipse(cx,cy+ry*1.02,60,9,0,0,6.3);c.fill();
+  const zig=ZIG(rx);
+  const draw=(top)=>{c.save();c.translate(cx,cy+ry*.78);c.rotate(tilt);c.translate(0,-ry*.78);
+    c.beginPath();c.rect(-120,top?-200:0,240,200);
+    if(brk>0||cp>0){c.beginPath();if(top){c.moveTo(-200,-200);c.lineTo(200,-200);c.lineTo(200,zig[6][1]);for(let i=6;i>=0;i--)c.lineTo(zig[i][0],zig[i][1]);c.lineTo(-200,zig[0][1])}else{c.moveTo(-200,200);c.lineTo(200,200);c.lineTo(200,zig[6][1]);for(let i=6;i>=0;i--)c.lineTo(zig[i][0],zig[i][1]);c.lineTo(-200,zig[0][1])}c.closePath()}
+    c.save();
+    if(brk>0&&top){c.restore();c.save();const k=Math.min(brk,1.2);c.translate(-30*k,-170*k+120*k*k);c.rotate(-.9*k);c.globalAlpha=Math.max(0,1-brk/1.0)*fade}
+    c.clip();
+    eggPath(c,rx,ry);c.fillStyle='#fffdf5';c.fill();bs(c,INK_,5);c.stroke();
+    c.fillStyle='#ffd9e2';c.beginPath();c.ellipse(-22,-ry*.45,10,16,.4,0,6.3);c.fill();
+    c.fillStyle=INK_;c.font='700 40px Caveat, cursive';c.textAlign='center';c.fillText('miracle',0,-14+(top?0:0));
+    c.restore();c.restore()};
+  // glow + sparks once open
+  if(brk>0){c.fillStyle='rgba(255,224,138,'+Math.min(.7,brk)+')';c.beginPath();c.ellipse(cx,cy-4,56*Math.min(1,brk*1.4),30*Math.min(1,brk*1.4),0,0,6.3);c.fill();
+    for(let i=0;i<9;i++){const a=i*.7+.3,d=brk*95*(.6+(i%3)*.25);const x=cx+Math.cos(a)*d,y=cy-10+Math.sin(a)*d*.8-brk*20;c.fillStyle=['#e8657f','#ffd166','#4aa87a','#4f8fd6'][i%4];c.beginPath();c.arc(x,y,5-brk*1.5>1?5-brk*1.5:1,0,6.3);c.fill()}}
+  draw(false);draw(true);
+  if(cp>0&&brk===0){wob(c,zig.slice(0,1+Math.ceil(cp*6)).map(q=>[cx+q[0]*Math.cos(tilt)-0,cy+ry*.0+q[1]]),INK_,4)}
+  c.restore();
+}
+function animJuggle(c,t){
+  const cx=150,by=235;
+  c.fillStyle='#ffe9c2';c.beginPath();c.moveTo(cx,40);c.lineTo(cx+120,255);c.lineTo(cx-120,255);c.closePath();c.globalAlpha=.55;c.fill();c.globalAlpha=1;
+  for(let i=0;i<3;i++){const th=t*3.1+i*2.094;const x=cx+Math.cos(th)*68,y=by-14-Math.abs(Math.sin(th))*150;
+    c.fillStyle='#ffa733';c.beginPath();c.arc(x,y,19,0,6.3);c.fill();bs(c,INK_,4);c.stroke();
+    c.fillStyle='#fff6';c.beginPath();c.ellipse(x-6,y-7,5,3,-.6,0,6.3);c.fill();
+    c.fillStyle='#4aa87a';c.beginPath();c.ellipse(x+3,y-20,8,4,-.5,0,6.3);c.fill();bs(c,INK_,2.5);c.stroke()}
+  // hands + sleeves
+  [-1,1].forEach(sd=>{const hx=cx+sd*72,hy=by+Math.sin(t*6.2+sd)*3;wob(c,[[hx+sd*40,hy+30],[hx+sd*18,hy+6]],'#e8657f',14);c.fillStyle='#ffd7b8';c.beginPath();c.arc(hx,hy,12,0,6.3);c.fill();bs(c,INK_,4);c.stroke()});
+  for(let i=0;i<4;i++){const a=t*2+i*1.6;const x=cx+Math.cos(a)*120,y=70+Math.sin(a*1.3)*20;c.fillStyle=['#ffd166','#e8657f','#4f8fd6','#4aa87a'][i];c.save();c.translate(x,y);c.rotate(a);c.fillRect(-4,-4,8,8);c.restore()}
+}
+function wheel(c,x,y,r,rot){c.beginPath();c.arc(x,y,r,0,6.3);bs(c,INK_,4);c.stroke();for(let i=0;i<6;i++){const a=rot+i*1.047;wob(c,[[x,y],[x+Math.cos(a)*r,y+Math.sin(a)*r]],INK_,1.6)}}
+function animBike(c,t){
+  const cx=150,cy=190,rx=88,ry=26,th=t*1.15;
+  c.strokeStyle='#3a3a4a55';c.setLineDash([6,8]);c.lineWidth=3;c.beginPath();c.ellipse(cx,cy+20,rx+22,ry+8,0,0,6.3);c.stroke();c.setLineDash([]);
+  // flags
+  ['#e8657f','#ffd166','#4f8fd6','#4aa87a','#e8657f','#ffd166'].forEach((col,i)=>{const a=i*1.047,x=cx+Math.cos(a)*(rx+22),y=cy+20+Math.sin(a)*(ry+8);c.fillStyle=col;c.beginPath();c.moveTo(x,y-34);c.lineTo(x+14,y-27);c.lineTo(x,y-20);c.closePath();c.fill();wob(c,[[x,y],[x,y-34]],INK_,2)});
+  const dir=-Math.sin(th)>0?1:-1,sc=.78+.3*(Math.sin(th)+1)/2,x=cx+Math.cos(th)*rx,y=cy+Math.sin(th)*ry;
+  c.save();c.translate(x,y);c.scale(sc*dir,sc);const rot=t*9;
+  wheel(c,-30,0,22,rot);wheel(c,30,0,22,rot);
+  wob(c,[[-30,0],[-8,-34],[22,-34],[30,0]],'#e8657f',5);wob(c,[[-8,-34],[6,0],[-30,0]],'#e8657f',5);wob(c,[[22,-34],[26,-50],[38,-50]],INK_,4);wob(c,[[-8,-34],[-12,-42],[-2,-42]],INK_,5);
+  const pa=rot*.9;wob(c,[[0,-4],[Math.cos(pa)*12,-4+Math.sin(pa)*12]],INK_,3);
+  // rider
+  wob(c,[[-4,-42],[2,-70]],'#4f8fd6',7);wob(c,[[2,-66],[26,-52]],'#4f8fd6',5);wob(c,[[-4,-42],[Math.cos(pa)*12,-4+Math.sin(pa)*12]],'#4f8fd6',5);
+  c.fillStyle='#ffd7b8';c.beginPath();c.arc(4,-82,11,0,6.3);c.fill();bs(c,INK_,3.5);c.stroke();
+  c.fillStyle='#ffd166';c.beginPath();c.moveTo(-6,-90);c.lineTo(5,-116);c.lineTo(16,-90);c.closePath();c.fill();bs(c,INK_,3);c.stroke();c.fillStyle='#e8657f';c.beginPath();c.arc(5,-117,4,0,6.3);c.fill();
+  c.restore();
+}
+function animCream(c,t){
+  const cx=150,m=Math.min(1,(t%7)/6.2),pop=(t%7)<.4?(1-(t%7)/.4):0;
+  c.save();c.translate(cx,150);c.scale(1+pop*.08,1-pop*.05);c.translate(-cx,-150);
+  // cone
+  c.beginPath();c.moveTo(104,150);c.lineTo(196,150);c.lineTo(150,268);c.closePath();c.fillStyle='#f1c27d';c.fill();bs(c,INK_,4);c.stroke();
+  for(let i=0;i<4;i++){wob(c,[[112+i*20,152],[134+i*8,198+i*0]],'#b9843c88',2)}
+  wob(c,[[190,160],[126,230]],'#b9843c88',2);wob(c,[[170,150],[116,205]],'#b9843c88',2);wob(c,[[136,150],[186,215]],'#b9843c88',2);
+  // puddle
+  c.fillStyle='#ffd1dc';c.beginPath();c.ellipse(cx,276,18+m*62,5+m*7,0,0,6.3);c.fill();bs(c,INK_,3);c.stroke();
+  // bottom scoop
+  c.beginPath();c.ellipse(cx,142,50+m*8,32-m*6,0,0,6.3);c.fillStyle='#ffd1dc';c.fill();bs(c,INK_,4);c.stroke();
+  // drips
+  [[-36,28],[-6,44],[26,36],[44,22]].forEach(([dx,L],i)=>{const len=m*L*(.7+.3*Math.sin(i+1)),x=cx+dx,y=148;c.fillStyle='#ffd1dc';c.beginPath();c.moveTo(x-9,y-4);c.lineTo(x-9,y+len);c.arc(x,y+len,9,3.14,0,true);c.lineTo(x+9,y-4);c.closePath();c.fill();bs(c,INK_,3.5);c.stroke();
+    if(m>.45){const f=((t*1.6+i*.37)%1);const dy=y+len+10+f*60;c.fillStyle='#ffd1dc';c.beginPath();c.arc(x,dy,5*(1-f*.4),0,6.3);c.fill()}});
+  // top scoop (sags as it melts)
+  const ty=96+m*34,tr=38-m*4,th_=36-m*14;
+  c.beginPath();c.ellipse(cx,ty,tr+m*10,th_,0,0,6.3);c.fillStyle='#fff2c9';c.fill();bs(c,INK_,4);c.stroke();
+  c.fillStyle='#fff8';c.beginPath();c.ellipse(cx-14,ty-10,8,5,-.5,0,6.3);c.fill();
+  // cherry
+  c.fillStyle='#e8445a';c.beginPath();c.arc(cx+6,ty-th_-8+m*3,9,0,6.3);c.fill();bs(c,INK_,3);c.stroke();wob(c,[[cx+6,ty-th_-16+m*3],[cx+14,ty-th_-30+m*3]],'#4aa87a',3);
+  c.restore();
+}
+const ANIMS=[animEgg,animJuggle,animBike,animCream];
+let busyRAF=0,busyLast=-1;
+function startBusy(){
+  let k;do{k=Math.floor(Math.random()*ANIMS.length)}while(k===busyLast&&ANIMS.length>1);busyLast=k;
+  $('busy').hidden=false;const cv=$('bz'),c=cv.getContext('2d'),t0=performance.now(),fn=ANIMS[k];
+  const loop=now=>{c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,300,300);fn(c,(now-t0)/1000);busyRAF=requestAnimationFrame(loop)};
+  cancelAnimationFrame(busyRAF);busyRAF=requestAnimationFrame(loop);
+}
+function stopBusy(){cancelAnimationFrame(busyRAF);$('busy').hidden=true}
+
 // ===== Miracle =====
 $('miracle').onclick=async()=>{
   if(!strokes.length)return;
-  $('busy').hidden=false;
+  startBusy();
+  window._poems=null;window._design={};window._redraw=false;window._img=null;lastPoem='';
   try{
     let img=null,poem=POEMS[Math.floor(Math.random()*POEMS.length)];
     if(SUPABASE_URL){
@@ -197,14 +308,14 @@ $('miracle').onclick=async()=>{
         body:JSON.stringify((()=>{const image=snapshot();return{image,width:window._crop.pw,height:window._crop.ph}})())});
       const j=await res.json();
       if(!j.image&&!j.svg)throw new Error(j.error||'fail');
-      window._poems=j.poems||{en:j.poem||poem};poem=poemOf()||poem;
+      window._poems=j.poems||{en:j.poem};poem=poemOf();if(!poem)throw new Error('no poem');
       img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=j.image||('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(j.svg))});window._redraw=!!j.image;window._design=j.design||{};try{const f=LANGF[lang]?LANGF[lang][0]:(FONTS[window._design.font]?window._design.font:'Caveat');await loadF(f,poemOf())}catch(e){}
     }else await new Promise(r=>setTimeout(r,1200));
     window._img=img;tpl=Math.floor(Math.random()*TPLS.length);
     compose(img,poem);
     pad.style.display='none';$('draw').hidden=true;$('result').hidden=false;setTimeout(()=>runTour('result'),900);
-  }catch(err){alert(ERR[lang])}
-  $('busy').hidden=true;
+  }catch(err){window._poems=null;window._redraw=false;alert(ERR[lang])}
+  stopBusy();
 };
 
 // ===== Hand-drawn engine =====
@@ -517,12 +628,8 @@ function compose(img,poem){
 
 // ===== Save / Share (the screen-size card itself) =====
 const blob_=()=>new Promise(r=>$('out').toBlob(r,'image/png'));
-const SH={en:['Share','Save image','LINE','Copy link'],zh:['分享','存圖','LINE','複製連結'],ja:['シェア','画像を保存','LINE','リンクをコピー']};
-const JOY={en:'I made a little miracle today. Sending you some hope. Draw yours back?',zh:'我今天畫了一個小小的奇蹟，把一點希望送給你。你也畫一幅回我好嗎？',ja:'今日、小さな奇跡を描きました。あなたにも希望を。あなたの奇跡も見せてね。'};
-let shText='';
 const pageUrl=()=>location.origin+location.pathname;
 const fileOf=async()=>new File([await blob_()],'my-miracle.png',{type:'image/png'});
-function openSheet(text){shText=text;document.querySelectorAll('#sheet button').forEach((b,i)=>b.querySelector('span').textContent=SH[lang][i]);$('sheet').hidden=false}
 async function showImg(){$('imgv').querySelector('img').src=URL.createObjectURL(await blob_());$('imgv').hidden=false}
 const desktop=()=>!matchMedia('(pointer:coarse)').matches;
 async function saveImg(){if(desktop()){const a=document.createElement('a');a.href=URL.createObjectURL(await blob_());a.download='my-miracle.png';a.click()}else await showImg()}
@@ -532,44 +639,62 @@ async function doShare(){
     if(navigator.share){await navigator.share({text:shText,url:pageUrl()});return}}catch(e){if(e&&e.name==='AbortError')return}
   await saveImg();
 }
-$('sheet').onclick=async e=>{
-  const b=e.target.closest('button');if(!b){if(e.target===$('sheet'))$('sheet').hidden=true;return}
-  const a=b.dataset.a;
-  if(a==='share'){$('sheet').hidden=true;await doShare()}
-  else if(a==='save'){$('sheet').hidden=true;await saveImg()}
-  else if(a==='line'){$('sheet').hidden=true;location.href='https://line.me/R/msg/text/?'+encodeURIComponent(shText+' '+pageUrl())}
-  else if(a==='copy'){try{await navigator.clipboard.writeText(shText+' '+pageUrl());b.querySelector('span').textContent='✓'}catch(er){}setTimeout(()=>{$('sheet').hidden=true},700)}
-};
 $('imgv').querySelector('.x').onclick=()=>{$('imgv').hidden=true};
-$('save').onclick=()=>saveImg();
-$('share').onclick=()=>openSheet(lastPoem.replace(/\n/g,' · '));
-$('joy').onclick=()=>openSheet(JOY[lang]);
-$('again').onclick=()=>{strokes=[];window._img=null;$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
+const shareText=()=>lastPoem+'\n'+pageUrl();
+$('b-share').onclick=()=>{shText=shareText();doShare()};
+$('b-save').onclick=()=>saveImg();
+$('b-line').onclick=()=>{location.href='https://line.me/R/msg/text/?'+encodeURIComponent(shareText())};
+$('b-copy').onclick=async()=>{const b=$('b-copy'),o=b.innerHTML;try{await navigator.clipboard.writeText(shareText())}catch(e){}
+  b.innerHTML='<svg viewBox="0 0 48 48"><path d="M9 26L20 37L40 12"/></svg>';setTimeout(()=>{b.innerHTML=o},1300)};
+$('again').onclick=()=>{strokes=[];window._img=null;window._poems=null;window._redraw=false;window._design={};lastPoem='';$('result').hidden=true;$('draw').hidden=false;pad.style.display='block';applyTheme();fit()};
 
+
+
+// ===== The maker's story (draft) =====
+const STORY={
+ en:{h:'Why I made miracle',p:['Everyone has days that feel too heavy to say out loud. On those days I did not want to hand my heaviness to the people I love, and I did not want to pretend I was fine either.','So I made a quiet place. You draw whatever you feel, with no rules and no talent needed. miracle looks at your lines, finds the small light hiding in them, and gives you back a picture and a few words made only for you.','When it feels right, send it on to someone who may be having a heavy day too. Not the sadness, only the light.','Every line you draw is already a little brave. Thank you for being here.'],by:'the maker of miracle',mail:'Write to me'},
+ zh:{h:'我為什麼做 miracle',p:['每個人都有說不出口的沉重日子。那些日子裡，我不想把沉重交給所愛的人，也不想假裝自己很好。','所以我做了一個安靜的地方。你只要把心情隨手畫下來，不需要規則，也不需要畫得好。miracle 會看著你的線條，找出藏在裡面的那一點光，還給你一幅畫和幾句只為你寫的話。','等你覺得合適，可以把它送給也許正在低潮的朋友：不是傳遞憂鬱，只傳遞那一點光。','你畫下的每一條線，本身就已經很勇敢。謝謝你來到這裡。'],by:'miracle 的創作者',mail:'寫信給我'},
+ ja:{h:'miracle を作った理由',p:['誰にでも、口に出すには重すぎる日があります。そんな日に、大切な人へその重さを渡したくなくて、でも平気なふりもしたくありませんでした。','だから、静かな場所を作りました。気持ちを自由に描くだけ。ルールも上手さもいりません。miracle は、あなたの線の中に隠れている小さな光を見つけて、あなただけの一枚の絵と、いくつかの言葉にして返します。','よければ、同じように重い日を過ごしているかもしれない誰かへ送ってください。悲しみではなく、光だけを。','あなたが引いた一本の線は、もう十分に勇気ある一本です。来てくれてありがとう。'],by:'miracle をつくった人',mail:'メッセージを送る'}};
+const MAIL='elainsmail@gmail.com';
+function openStory(){
+  const d=STORY[lang],f=lang==='zh'?"'LXGW WenKai TC'":lang==='ja'?"'Klee One'":"'Caveat'";
+  const box=$('story').querySelector('.in');box.style.fontFamily=f+',cursive';
+  box.innerHTML=`<h2 style="font-family:${f},cursive">${d.h}</h2>`+d.p.map(t=>`<p style="font-family:${f},cursive">${t}</p>`).join('')+`<p class="by" style="font-family:${f},cursive">— ${d.by}</p><a class="mail" style="font-family:${f},cursive" href="mailto:${MAIL}?subject=${encodeURIComponent('Hello from miracle')}"><svg viewBox="0 0 48 48"><path d="M6 12L42 12L42 38L6 38Z"/><path d="M6 13L24 28L42 13"/></svg>${d.mail}</a><div class="addr">${MAIL}</div>`;
+  $('story').hidden=false;$('story').querySelector('.card').scrollTop=0;
+}
+document.querySelectorAll('.storybtn').forEach(b=>b.onclick=openStory);
+$('story').onclick=e=>{if(e.target===$('story'))$('story').hidden=true};
+$('story').querySelector('.x').onclick=()=>{$('story').hidden=true};
 
 // ===== Friendly step-by-step tour (X = never show again) =====
 const TOUR={
- en:{pad:'Draw anything you feel, right here on the blank space',lang:'Pick your language here',go:'Done drawing? Press here and a little miracle appears',bar:'Save it, share it, or send joy to a friend',dot:'Tap this dot to change the text design',next:'Next',ok:'Got it'},
- zh:{pad:'在空白的地方，隨心畫下此刻的心情',lang:'在這裡選擇語言',go:'畫好了嗎？按這裡，奇蹟就會出現',bar:'可以存圖、分享，或把好心情送給朋友',dot:'點這個圓點，換一種文字設計',next:'下一步',ok:'知道了'},
- ja:{pad:'空いているところに、今の気持ちを自由に描いてね',lang:'ここで言語を選べます',go:'描けたら、ここを押すと小さな奇跡が現れます',bar:'保存したり、シェアしたり、友だちに喜びを送れます',dot:'この丸をタップすると文字のデザインが変わります',next:'次へ',ok:'わかった'}};
-const TSTEPS={draw:[['pad','pad'],['#draw .lang','lang'],['#miracle','go']],result:[['#result .bottom','bar'],['#theme2','dot']]};
+ pad:['Draw anything you feel on the blank space','在空白的地方，隨心畫下此刻的心情','空いているところに、今の気持ちを描いてね'],
+ lang:['Pick your language here','在這裡選擇語言','ここで言語を選べます'],
+ story:['Tap here to read why I made miracle','點這裡，看我為什麼做了 miracle','ここをタップして、miracleを作った理由を読めます'],
+ go:['Done? Press here and a little miracle appears','畫好了嗎？按這裡，奇蹟就會出現','描けたら、ここを押すと小さな奇跡が現れます'],
+ bar:['Share, save, send on LINE, or copy the link','分享、存圖、傳 LINE、複製連結','シェア・保存・LINE・リンクコピー'],
+ dot:['Tap the dot to change the text design','點這個圓點，換一種文字設計','丸をタップすると文字のデザインが変わります'],
+ new:['Draw a new one here','在這裡畫新的一幅','ここで新しく描けます'],
+ next:['Next','下一步','次へ'],ok:['Got it','知道了','わかった']};
+const TFONT=["'Caveat'","'LXGW WenKai TC'","'Klee One'"];
+const TSTEPS={draw:[['pad','pad'],['#draw .lang','lang'],['#draw .logo','story'],['#miracle','go']],result:[['#result .bottom','bar'],['#theme2','dot'],['#again','new']]};
 const tget=k=>{try{return localStorage.getItem('mr_tour_'+k)==='1'}catch(e){return false}},tset=k=>{try{localStorage.setItem('mr_tour_'+k,'1')}catch(e){}};
 let tourOn=false;
 function runTour(kind){
-  if(tget('off')||tget(kind)||tourOn)return;
+  if(tget('off')||tget(kind+'2')||tourOn)return;
   const steps=TSTEPS[kind];let i=0;tourOn=true;
   const root=document.createElement('div');root.id='tour';
-  root.style.setProperty('--tf',lang==='zh'?"'LXGW WenKai TC'":lang==='ja'?"'Klee One'":"'Caveat'");
+  
   root.innerHTML='<div class="hole"></div><div class="bub"><i class="tail"></i><span class="in"><div class="top"><div class="mas"><svg viewBox="0 0 60 60"><path d="M30 6C45 6 54 17 54 31C54 46 44 55 30 55C16 55 6 46 6 31C6 17 15 6 30 6Z" fill="#ffe08a" stroke="#3a3a4a" stroke-width="3"/><circle cx="22" cy="29" r="3" fill="#3a3a4a"/><circle cx="38" cy="29" r="3" fill="#3a3a4a"/><path d="M23 38Q30 45 37 38" fill="none" stroke="#3a3a4a" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="36" r="4" fill="#ffb4a2" opacity=".7"/><circle cx="44" cy="36" r="4" fill="#ffb4a2" opacity=".7"/></svg></div><div class="tt"></div></div><div class="row"><span class="dots"></span><button class="nx"><span></span><svg viewBox="0 0 30 30"><path d="M5 15C11 14 17 16 24 15"/><path d="M18 8L25 15L18 22"/></svg></button></div></span><button class="cl" aria-label="close"><svg viewBox="0 0 16 16"><path d="M3 3L13 13M13 3L3 13"/></svg></button></div>';
   $('phone').appendChild(root);
   const hole=root.querySelector('.hole'),bub=root.querySelector('.bub'),tail=root.querySelector('.tail'),tt=root.querySelector('.tt'),dots=root.querySelector('.dots'),nx=root.querySelector('.nx');
-  const end=done=>{root.remove();tourOn=false;if(done)tset(kind)};
+  const end=done=>{root.remove();tourOn=false;if(done)tset(kind+'2')};
   function place(){
     const [sel,key]=steps[i],P=$('phone').getBoundingClientRect();let r;
     if(sel==='pad'){r={left:P.width*.12,top:P.height*.16,width:P.width*.76,height:P.height*.3}}
     else{const b=document.querySelector(sel).getBoundingClientRect();r={left:b.left-P.left-8,top:b.top-P.top-8,width:b.width+16,height:b.height+16}}
     Object.assign(hole.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
-    tt.textContent=TOUR[lang][key];nx.firstChild.textContent=i<steps.length-1?TOUR[lang].next:TOUR[lang].ok;
+    tt.innerHTML=TOUR[key].map((t,k)=>`<div style="font-family:${TFONT[k]},cursive">${t}</div>`).join('');nx.firstChild.textContent=(i<steps.length-1?TOUR.next:TOUR.ok).join(' · ');
     dots.innerHTML=steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
     bub.style.animation='none';bub.offsetWidth;bub.style.animation='';
     bub.style.width=Math.min(P.width*.86,360)+'px';
@@ -584,7 +709,7 @@ function runTour(kind){
   root.querySelector('.cl').onclick=()=>{tset('off');end(false)};
   place();
 }
-document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[lang]);$('busy').textContent=BUSY[lang];
+document.querySelectorAll('.lang').forEach(b=>b.textContent=LBL[lang]);$('bt').textContent=BUSY[lang];
 applyTheme();fit();setTimeout(()=>runTour('draw'),900);
 ['resize','orientationchange'].forEach(e=>addEventListener(e,()=>setTimeout(fit,60)));if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(fit,60));
 </script>
